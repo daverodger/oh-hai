@@ -1,5 +1,6 @@
 use std::io::{stdout, prelude::*, BufReader};
 use std::fs::File;
+use std::string::ToString;
 use crossterm::{event::{self, KeyEventKind}, ExecutableCommand, terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen,
     LeaveAlternateScreen,
@@ -13,16 +14,46 @@ use bookmark::Bookmark;
 
 mod bookmark;
 
+struct Model {
+    app_state: AppState,
+    highlighted_command: usize,
+    bookmark_file: File,
+}
+
+enum AppState {
+    Searching,
+    Inserting,
+    Initializing,
+}
+
+enum Actions {
+    Delete,
+    Insert,
+    EntryDown,
+    EntryUp,
+    ReturnCommand,
+}
+
+const BOOKMARK_FILE: String = "bookmarks.yaml".to_string(); // TODO use const fn to read config name/location?
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    let bookmark_file = File::open("bookmarks.yaml");
-    if let Err(_) = bookmark_file {
-        File::create("bookmarks.yaml")?;
-    }
+    let mut bookmark_file = File::options()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(BOOKMARK_FILE)?;
+
+    let model = Model {
+        app_state: AppState::Initializing,
+        highlighted_command: 0,
+        bookmark_file,
+    };
+
     let deserialized_bookmarks: Vec<Bookmark> = serde_yaml::from_reader(File::open("bookmarks.yaml")?)?;
     let mut state = ListState::default();
     state.select(Some(0)); // TODO manipulate this inside event loop
