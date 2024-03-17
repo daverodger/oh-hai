@@ -1,10 +1,10 @@
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout};
 use ratatui::widgets::ListState;
-use tui_textarea::TextArea;
-use crate::{AppState, Model};
 
-pub(crate) fn view(frame: &mut Frame, model: &Model) {
+use crate::model::{AppState, Model};
+
+pub fn view(frame: &mut Frame, model: &Model) {
     match model.app_state {
         AppState::Searching => {
             let mut state = ListState::default();
