@@ -18,8 +18,8 @@ impl Bookmark {
         }
     }
 
-    pub fn tui_text(&self) -> Text {
-        Text::from(format!("Title: {}\nCommand: {}", self.title, self.command))
+    pub fn tui_text(self) -> Text<'static> {
+        Text::raw(format!("Title: {}\nCommand: {}", self.title, self.command))
 
     }
 }

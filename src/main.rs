@@ -5,36 +5,49 @@ use crossterm::{event::{self, KeyEventKind}, ExecutableCommand, terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen,
     LeaveAlternateScreen,
 }};
+use crossterm::event::KeyEvent;
 use ratatui::{
     prelude::*,
 };
 use ratatui::widgets::{Block, Borders, List, ListDirection, ListState};
 use tui_textarea::TextArea;
 use bookmark::Bookmark;
+use crate::handle::handle;
+use crate::update::{deserialize_commands, update};
 
 mod bookmark;
+mod view;
+mod update;
+mod handle;
 
-struct Model {
+#[derive(Debug)]
+struct Model<'a> {
     app_state: AppState,
     highlighted_command: usize,
     bookmark_file: File,
+    commands: Option<List<'a>>,
+    free_text_area: TextArea<'a>
 }
 
+#[derive(Debug, PartialEq, Eq)]
 enum AppState {
     Searching,
     Inserting,
-    Initializing,
+    Done,
 }
 
-enum Actions {
+#[derive(PartialEq)]
+enum Action {
     Delete,
     Insert,
     EntryDown,
     EntryUp,
     ReturnCommand,
+    Search,
+    KeyInput(KeyEvent),
 }
 
-const BOOKMARK_FILE: String = "bookmarks.yaml".to_string(); // TODO use const fn to read config name/location?
+const BOOKMARK_FILE: &'static str = "bookmarks.yaml"; // TODO use const fn to read config name/location?
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     stdout().execute(EnterAlternateScreen)?;
@@ -48,64 +61,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .create(true)
         .open(BOOKMARK_FILE)?;
 
-    let model = Model {
-        app_state: AppState::Initializing,
+    let mut model = Model {
+        app_state: AppState::Searching, // TODO should be set based on program entry
         highlighted_command: 0,
         bookmark_file,
+        commands: None,
+        free_text_area: TextArea::default()
     };
+    deserialize_commands(&mut model); // TODO only do this if searching
 
-    let deserialized_bookmarks: Vec<Bookmark> = serde_yaml::from_reader(File::open("bookmarks.yaml")?)?;
-    let mut state = ListState::default();
-    state.select(Some(0)); // TODO manipulate this inside event loop
-    let command_list = List::new(
-        deserialized_bookmarks.iter()
-            .map(|b| b.tui_text())
-            .collect::<Vec<Text>>())
-        .block(Block::default().title("Saved Commands").borders(Borders::ALL))
-        .style(Style::default().fg(Color::White))
-        .highlight_style(Style::default().bg(Color::DarkGray))
-        .highlight_symbol(">>")
-        .direction(ListDirection::TopToBottom);
-
-
-    let mut text_area = TextArea::default();
-    loop {
+    while model.app_state != AppState::Done {
         terminal.draw(|frame| {
-            let layout = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints(vec![
-                    Constraint::Length(1),
-                    Constraint::Min(2),
-                ])
-                .split(frame.size());
-
-            frame.render_widget(
-                text_area.widget(),
-                layout[0],
-            );
-
-            frame.render_stateful_widget(
-                &command_list,
-                layout[1],
-                &mut state)
+            view::view(frame, &model);
         })?;
 
-        if event::poll(std::time::Duration::from_millis(16))? {
-            if let event::Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press {
-                    match key.code {
-                        event::KeyCode::Char(_) | event::KeyCode::Backspace => {
-                            text_area.input(key);
-                            continue;
-                        }
-                        event::KeyCode::Enter => {
-                            print!("{}", text_area.yank_text()); // TODO does this work?
-                            break;
-                        }
-                        _ => todo!()
-                    }
-                }
-            }
+        let message = handle();
+
+        if let Some(action) = message {
+            update::update(action, &mut model);
         }
     }
 
