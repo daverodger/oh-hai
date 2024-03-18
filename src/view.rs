@@ -8,7 +8,7 @@ pub fn view(frame: &mut Frame, model: &Model) {
     match model.app_state {
         AppState::Searching => {
             let mut state = ListState::default();
-            state.select(Some(model.highlighted_command)); // TODO manipulate this inside event loop
+            state.select(Some(model.active_command));
             let layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints(vec![
@@ -24,7 +24,7 @@ pub fn view(frame: &mut Frame, model: &Model) {
 
             if let Some(_) = &model.commands {
                 frame.render_stateful_widget(
-                    model.commands.clone().expect("Check already confirmed not None variant"),
+                    model.commands.clone().expect("Check already confirmed Some variant"),
                     layout[1],
                     &mut state)
             }
