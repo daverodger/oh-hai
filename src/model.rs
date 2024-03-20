@@ -2,21 +2,24 @@ use std::fs::File;
 
 use crossterm::event::KeyEvent;
 use ratatui::prelude::{Color, Style, Stylize, Text};
-use ratatui::widgets::{Block, Borders, List, ListDirection};
+use ratatui::widgets::{Block, Borders, List, ListDirection, ListState};
 use tui_textarea::TextArea;
 
 use crate::bookmark::Bookmark;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Model<'a> {
     pub app_state: AppState,
-    pub active_command: usize,
-    pub bookmark_file: File,
-    pub commands: Option<List<'a>>,
+    pub command_list: StatefulList,
     pub free_text_area: TextArea<'a>
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone)]
+pub struct StatefulList {
+    pub state: ListState,
+    pub commands: Vec<Bookmark>
+}
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum AppState {
     Searching,
     Inserting,
@@ -42,24 +45,30 @@ impl Model<'_> {
     pub fn new() -> Self {
         Model {
             app_state: AppState::Searching, // TODO should be set based on program entry
-            active_command: 0,
-            bookmark_file: Self::get_bookmark_file().expect("File should either already exist or have been created"),
-            commands: None,
+            command_list: StatefulList {
+                state: ListState::default(),
+                commands: Vec::new(),
+            },
             free_text_area: styled_text_area()
         }
     }
 
     pub fn deserialize_commands(&mut self) {
-        let deserialized_bookmarks: Vec<Bookmark> = serde_yaml::from_reader(&self.bookmark_file).unwrap_or(vec![]);
-        self.commands = Some(List::new(
-            deserialized_bookmarks.into_iter()
-                .map(|b| b.tui_text())
-                .collect::<Vec<Text>>())
+        let bookmark_file = Self::get_bookmark_file().expect("File should exist or have been created");
+        self.command_list.commands = serde_yaml::from_reader(bookmark_file).unwrap_or(vec![]);
+    }
+
+    pub fn reset_state(&mut self) {
+        self.command_list.state.select(Some(0));
+    }
+
+    pub fn get_command_list(bookmarks: Vec<Bookmark>) -> List<'static> {
+        List::new(bookmarks.into_iter().map(|x| x.tui_text()).collect::<Vec<Text>>())
             .block(Block::default().title("Saved Commands").borders(Borders::ALL))
             .white()
             .highlight_style(Style::default().bg(Color::DarkGray))
             .highlight_symbol(">>")
-            .direction(ListDirection::TopToBottom));
+            .direction(ListDirection::TopToBottom)
     }
 
     fn get_bookmark_file() -> Result<File, Box<dyn std::error::Error>> {
@@ -72,7 +81,7 @@ impl Model<'_> {
     }
 
     pub fn command_list_len(&self) -> usize {
-        self.commands.as_ref().map_or(0, |x| x.len())
+        self.command_list.commands.len()
     }
 }
 

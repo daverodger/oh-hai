@@ -1,12 +1,7 @@
-use std::io::prelude::*;
-use std::string::ToString;
-
-use crossterm::ExecutableCommand;
-use ratatui::prelude::*;
-
 use model::{AppState, Model};
 
 use crate::handle::handle;
+use crate::model::Action;
 
 mod bookmark;
 mod view;
@@ -22,11 +17,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut model = Model::new();
 
-    model.deserialize_commands(); // TODO only do this if in search mode... update does this too?
+    update::update(Action::Search, &mut model);
 
     while model.app_state != AppState::Done {
         terminal.draw(|frame| {
-            view::view(frame, &model);
+            view::view(frame, &mut model);
         })?;
 
         let message = handle();

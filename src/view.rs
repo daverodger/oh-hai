@@ -1,14 +1,11 @@
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout};
-use ratatui::widgets::ListState;
 
 use crate::model::{AppState, Model};
 
-pub fn view(frame: &mut Frame, model: &Model) {
+pub fn view(frame: &mut Frame, model: &mut Model) {
     match model.app_state {
         AppState::Searching => {
-            let mut state = ListState::default();
-            state.select(Some(model.active_command));
             let layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints(vec![
@@ -22,12 +19,10 @@ pub fn view(frame: &mut Frame, model: &Model) {
                 layout[0],
             );
 
-            if let Some(_) = &model.commands {
-                frame.render_stateful_widget(
-                    model.commands.clone().expect("Check already confirmed Some variant"),
-                    layout[1],
-                    &mut state)
-            }
+            frame.render_stateful_widget(
+                Model::get_command_list(model.command_list.commands.clone()),
+                layout[1],
+                &mut model.command_list.state)
         }
         _ => ()
     }

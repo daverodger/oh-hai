@@ -1,34 +1,35 @@
-use crossterm::event;
-
 use crate::model::{Action, AppState, Model};
 
 pub fn update(action: Action, model: &mut Model) {
     match action {
         Action::Search => {
             model.deserialize_commands();
+            model.reset_state();
             model.app_state = AppState::Searching;
-            model.active_command = 0;
         }
         Action::KeyInput(key) => {
-            match key.code {
-                event::KeyCode::Char(_) | event::KeyCode::Backspace => {
                     model.free_text_area.input(key);
-                }
-                _ => todo!()
-            }
+            // TODO reorder commands
         }
         Action::EntryDown => {
-            model.active_command += 1;
-            if model.active_command >= model.command_list_len() {
-                model.active_command = 0;
-            }
+            let len = model.command_list_len();
+            model.command_list.state.selected_mut().as_mut().map(|x| {
+                if *x + 1 >= len {
+                    *x = 0;
+                } else {
+                    *x += 1;
+                }
+            });
         }
         Action::EntryUp => {
-            if model.active_command == 0 {
-                model.active_command = model.command_list_len() - 1;
-            } else {
-                model.active_command -= 1;
-            }
+            let len = model.command_list_len();
+            model.command_list.state.selected_mut().as_mut().map(|x| {
+                if *x == 0 {
+                    *x = len - 1;
+                } else {
+                    *x -= 1;
+                }
+            });
         }
         Action::Exit => {
             model.app_state = AppState::Done;
