@@ -8,14 +8,28 @@ struct CommandScore(i64, Bookmark);
 pub fn sort(commands: Vec<Bookmark>, pattern: &str) -> Vec<Bookmark> {
     let mut score_map: Vec<CommandScore> = Vec::new();
     let matcher = SkimMatcherV2::default();
-    for b in commands {
-        let title_score = matcher.fuzzy_match(&b.title, pattern);
-        let command_score = matcher.fuzzy_match(&b.command, pattern);
+    for mut b in commands {
+        let mut title_score = None;
+        let mut title_index = vec![];
+        let mut command_score = None;
+        let mut command_index= vec![];
+        if let Some(tuple) = matcher.fuzzy_indices(&b.title, pattern) {
+            title_score = Some(tuple.0);
+            title_index = tuple.1;
+        }
+        if let Some(tuple) = matcher.fuzzy_indices(&b.command, pattern) {
+            command_score = Some(tuple.0);
+            command_index = tuple.1;
+        }
         match (title_score, command_score) {
             (Some(score), None) | (None, Some(score)) => {
+                b.title_highlights = title_index;
+                b.command_highlights = command_index;
                 score_map.push(CommandScore(score, b));
             }
             (Some(score1), Some(score2)) => {
+                b.title_highlights = title_index;
+                b.command_highlights = command_index;
                 score_map.push(CommandScore(score1 + score2, b))
             }
             _ => ()

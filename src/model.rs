@@ -67,8 +67,9 @@ impl Model<'_> {
     }
 
     pub fn get_command_list(bookmarks: Vec<Bookmark>) -> List<'static> {
-        List::new(bookmarks.into_iter().map(|x| x.tui_text()).collect::<Vec<Text>>())
-            .block(Block::default().title("Saved Commands").borders(Borders::ALL))
+        let len = bookmarks.len();
+        List::new(bookmarks.into_iter().map(|x| x.tui_text_fuzzy()).collect::<Vec<Text>>())
+            .block(Block::default().title(format!("{} Command(s)", len)).borders(Borders::ALL))
             .white()
             .highlight_style(Style::default().bg(Color::DarkGray))
             .highlight_symbol(">>")
