@@ -20,7 +20,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             );
 
             frame.render_stateful_widget(
-                Model::get_command_list(model.command_list.commands.clone()),
+                Model::get_command_list(model.command_list.sorted_commands.clone()),
                 layout[1],
                 &mut model.command_list.state)
         }

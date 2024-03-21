@@ -1,7 +1,5 @@
-use model::{AppState, Model};
-
-use crate::handle::handle;
-use crate::model::Action;
+use handle::handle;
+use model::{Action, AppState, Model};
 
 mod bookmark;
 mod view;
@@ -9,10 +7,10 @@ mod update;
 mod handle;
 mod tui;
 mod model;
+mod matcher;
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-
     let mut terminal = tui::init_terminal()?;
 
     let mut model = Model::new();

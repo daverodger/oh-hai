@@ -11,14 +11,16 @@ use crate::bookmark::Bookmark;
 pub struct Model<'a> {
     pub app_state: AppState,
     pub command_list: StatefulList,
-    pub free_text_area: TextArea<'a>
+    pub free_text_area: TextArea<'a>,
 }
 
 #[derive(Debug, Clone)]
 pub struct StatefulList {
     pub state: ListState,
-    pub commands: Vec<Bookmark>
+    pub commands: Vec<Bookmark>,
+    pub sorted_commands: Vec<Bookmark>,
 }
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum AppState {
     Searching,
@@ -48,14 +50,16 @@ impl Model<'_> {
             command_list: StatefulList {
                 state: ListState::default(),
                 commands: Vec::new(),
+                sorted_commands: Vec::new(),
             },
-            free_text_area: styled_text_area()
+            free_text_area: styled_text_area(),
         }
     }
 
     pub fn deserialize_commands(&mut self) {
         let bookmark_file = Self::get_bookmark_file().expect("File should exist or have been created");
         self.command_list.commands = serde_yaml::from_reader(bookmark_file).unwrap_or(vec![]);
+        self.command_list.sorted_commands = self.command_list.commands.clone();
     }
 
     pub fn reset_state(&mut self) {
@@ -80,8 +84,8 @@ impl Model<'_> {
         Ok(bookmark_file)
     }
 
-    pub fn command_list_len(&self) -> usize {
-        self.command_list.commands.len()
+    pub fn sorted_command_len(&self) -> usize {
+        self.command_list.sorted_commands.len()
     }
 }
 
@@ -91,7 +95,7 @@ fn styled_text_area() -> TextArea<'static> {
     let line_style = Style::default().fg(Color::White);
     ta.set_cursor_line_style(line_style);
 
-    let cursor_style =Style::default().bg(Color::White).slow_blink();
+    let cursor_style = Style::default().bg(Color::White).slow_blink();
     ta.set_cursor_style(cursor_style);
 
     ta

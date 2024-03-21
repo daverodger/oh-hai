@@ -4,7 +4,7 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use ratatui::{Terminal, TerminalOptions, Viewport};
 use ratatui::backend::CrosstermBackend;
 
-pub fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn std::error::Error>>{
+pub fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn std::error::Error>> {
     // stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
     let options = TerminalOptions {
@@ -14,7 +14,7 @@ pub fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn std
     Ok(terminal)
 }
 
-pub fn restore_terminal() -> Result<(), Box<dyn std::error::Error>>{
+pub fn restore_terminal() -> Result<(), Box<dyn std::error::Error>> {
     // stdout().execute(LeaveAlternateScreen)?;
     disable_raw_mode()?;
     Ok(())
