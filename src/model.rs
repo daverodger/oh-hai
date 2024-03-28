@@ -3,15 +3,17 @@ use std::fs::File;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::{Color, Style, Stylize, Text};
 use ratatui::widgets::{Block, Borders, List, ListDirection, ListState};
-use tui_textarea::TextArea;
+use tui_textarea::{CursorMove, TextArea};
 
 use crate::bookmark::Bookmark;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Model<'a> {
     pub app_state: AppState,
     pub command_list: StatefulList,
-    pub free_text_area: TextArea<'a>,
+    pub search_text_area: TextArea<'a>,
+    pub insert_text_area: TextArea<'a>,
+    pub bookmark_file: File
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +28,7 @@ pub enum AppState {
     Searching,
     Inserting,
     Done,
+    Initializing
 }
 
 #[derive(PartialEq)]
@@ -45,20 +48,24 @@ const BOOKMARK_FILE: &'static str = "bookmarks.yaml"; // TODO use const fn to re
 
 impl Model<'_> {
     pub fn new() -> Self {
+        let mut itext = styled_text_area();
+        itext.insert_newline();
+        itext.move_cursor(CursorMove::Top);
         Model {
-            app_state: AppState::Searching, // TODO should be set based on program entry
+            app_state: AppState::Initializing,
             command_list: StatefulList {
                 state: ListState::default(),
                 commands: Vec::new(),
                 sorted_commands: Vec::new(),
             },
-            free_text_area: styled_text_area(),
+            search_text_area: styled_text_area(),
+            insert_text_area: itext,
+            bookmark_file: Self::get_bookmark_file().expect("File should exist")
         }
     }
 
     pub fn deserialize_commands(&mut self) {
-        let bookmark_file = Self::get_bookmark_file().expect("File should exist or have been created");
-        self.command_list.commands = serde_yaml::from_reader(bookmark_file).unwrap_or(vec![]);
+        self.command_list.commands = serde_yaml::from_reader(&self.bookmark_file).unwrap_or(vec![]);
         self.command_list.sorted_commands = self.command_list.commands.clone();
     }
 
@@ -80,6 +87,7 @@ impl Model<'_> {
         let bookmark_file = File::options()
             .read(true)
             .write(true)
+            .append(true)
             .create(true)
             .open(BOOKMARK_FILE)?;
         Ok(bookmark_file)

@@ -7,8 +7,8 @@ pub fn handle() -> Option<Action> {
         if let event::Event::Key(key) = event::read().ok()? {
             if key.kind == KeyEventKind::Press {
                 return match key.code {
-                    KeyCode::Down => Some(Action::EntryDown),
-                    KeyCode::Up => Some(Action::EntryUp),
+                    KeyCode::Down | KeyCode::Tab => Some(Action::EntryDown),
+                    KeyCode::Up | KeyCode::BackTab => Some(Action::EntryUp),
                     KeyCode::Esc => Some(Action::Exit),
                     KeyCode::Enter => Some(Action::Submit),
                     _ => Some(Action::KeyInput(key))

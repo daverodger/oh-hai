@@ -1,18 +1,37 @@
 use crossterm::event::KeyCode;
+use tui_textarea::CursorMove;
 
+use crate::bookmark::Bookmark;
 use crate::matcher;
 use crate::model::{Action, AppState, Model};
 
 pub fn update(action: Action, model: &mut Model) {
-    match action {
-        Action::Search => {
-            model.deserialize_commands();
-            model.reset_state();
-            model.app_state = AppState::Searching;
+    match model.app_state {
+        AppState::Searching => searching_update(action, model),
+        AppState::Inserting => inserting_update(action, model),
+        AppState::Initializing => {
+            match action {
+                Action::Search => {
+                    model.deserialize_commands();
+                    model.reset_state();
+                    model.app_state = AppState::Searching;
+                }
+                Action::Insert => {
+                    model.app_state = AppState::Inserting;
+                    // TODO get command line text and store somewhere
+                }
+                _ => ()
+            }
         }
+        _ => ()
+    }
+}
+
+fn searching_update(action: Action, model: &mut Model) {
+    match action {
         Action::KeyInput(key) => {
-            model.free_text_area.input(key);
-            let search_text = &model.free_text_area.lines()[0];
+            model.search_text_area.input(key);
+            let search_text = &model.search_text_area.lines()[0];
             match key.code {
                 KeyCode::Backspace => {
                     if search_text.is_empty() {
@@ -51,9 +70,57 @@ pub fn update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Submit => {
-            print!("{}", model.free_text_area.yank_text()); // TODO does this work to output to bash variable?
+            // TODO output search_text_area somehow for use by bash script
             model.app_state = AppState::Done;
         }
-        _ => {}
+        _ => ()
+    }
+}
+
+fn inserting_update(action: Action, model: &mut Model) {
+    match action {
+        Action::KeyInput(key) => {
+            model.insert_text_area.input(key);
+            let insert_text = &model.insert_text_area.lines()[0];
+            // TODO warn if duplicate name or command
+            match key.code {
+                KeyCode::Backspace => {
+                    if insert_text.is_empty() {
+                        // TODO display some warning must not be blank. needs to be for both lines though
+                        // TODO Backspace must not delete the command line
+                    }
+                }
+                _ => ()
+            }
+        }
+        Action::EntryDown | Action::EntryUp => {
+            match model.insert_text_area.cursor() {
+                (0, _) => {
+                    model.insert_text_area.move_cursor(CursorMove::Bottom);
+                    model.insert_text_area.move_cursor(CursorMove::End);
+                }
+                (1, _) => {
+                    model.insert_text_area.move_cursor(CursorMove::Top);
+                    model.insert_text_area.move_cursor(CursorMove::End);
+                }
+                _ => ()
+            }
+        }
+        Action::Exit => {
+            model.app_state = AppState::Done;
+        }
+        Action::Submit => {
+            let mut lines = model.insert_text_area.lines().to_owned();
+            let (command, title) = (
+                lines.pop().unwrap(),
+                lines.pop().unwrap(),
+            );
+            let bm = Bookmark::new(title, command);
+            let buffer = vec![bm];
+            serde_yaml::to_writer(&model.bookmark_file, &buffer).unwrap();
+
+            model.app_state = AppState::Done;
+        }
+        _ => ()
     }
 }
