@@ -1,8 +1,8 @@
 use std::io::stdout;
 
 use ratatui::backend::CrosstermBackend;
+use ratatui::prelude::{Color, Style};
 use ratatui::Terminal;
-use tui_textarea::CursorMove;
 
 use handle::handle;
 use model::{Action, AppState, Model};
@@ -31,10 +31,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "-i" => {
             terminal = tui::init_terminal(4)?;
             if let Some(cmd) = args.get(1) {
-                model.insert_text_area.move_cursor(CursorMove::Down);
-                model.insert_text_area.insert_str(cmd);
-                model.insert_text_area.move_cursor(CursorMove::Up);
+                model.insert_text_area[1].insert_str(cmd);
             }
+            model.insert_text_area[0].set_cursor_style(Style::default().bg(Color::White)); // TODO move to model probably?
             update::update(Action::Insert, &mut model);
         },
         _ => ()

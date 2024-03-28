@@ -1,6 +1,6 @@
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout};
-use ratatui::prelude::{Line, Text};
+use ratatui::prelude::Line;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::model::{AppState, Model};
@@ -34,11 +34,12 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 .direction(Direction::Vertical)
                 .constraints(vec![
                     Constraint::Max(1),
-                    Constraint::Min(2),
+                    Constraint::Max(1),
+                    Constraint::Max(1),
                 ])
                 .split(frame.size());
 
-            let inner_layout = Layout::default()
+            let title_row = Layout::default()
                 .direction(Direction::Horizontal)
                 .constraints(vec![
                     Constraint::Max(10),
@@ -46,22 +47,37 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 ])
                 .split(outer_layout[1]);
 
+            let cmd_row = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints(vec![
+                    Constraint::Max(10),
+                    Constraint::Min(1),
+                ])
+                .split(outer_layout[2]);
+
             frame.render_widget(
                 block,
                 frame.size(),
             );
 
             frame.render_widget(
-                Paragraph::new(Text::from(vec![
-                    Line::raw("Name: ").right_aligned(),
-                    Line::raw("Command: ").right_aligned(),
-                ])),
-                inner_layout[0],
+                Paragraph::new(Line::raw("Name: ").right_aligned()),
+                title_row[0],
             );
 
             frame.render_widget(
-                model.insert_text_area.widget(),
-                inner_layout[1],
+                model.insert_text_area[0].widget(),
+                title_row[1],
+            );
+
+            frame.render_widget(
+                Paragraph::new(Line::raw("Command: ").right_aligned()),
+                cmd_row[0],
+            );
+
+            frame.render_widget(
+                model.insert_text_area[1].widget(),
+                cmd_row[1],
             );
         }
         _ => ()

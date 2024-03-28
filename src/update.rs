@@ -1,5 +1,6 @@
 use crossterm::event::KeyCode;
-use tui_textarea::CursorMove;
+use ratatui::prelude::Color;
+use ratatui::style::Style;
 
 use crate::bookmark::Bookmark;
 use crate::matcher;
@@ -80,12 +81,11 @@ fn searching_update(action: Action, model: &mut Model) {
 fn inserting_update(action: Action, model: &mut Model) {
     match action {
         Action::KeyInput(key) => {
-            model.insert_text_area.input(key);
-            let insert_text = &model.insert_text_area.lines()[0];
+            model.insert_text_area[model.focus_insert].input(key);
             // TODO warn if duplicate name or command
             match key.code {
                 KeyCode::Backspace => {
-                    if insert_text.is_empty() {
+                    if model.insert_text_area[1].is_empty() {
                         // TODO display some warning must not be blank. needs to be for both lines though
                         // TODO Backspace must not delete the command line
                     }
@@ -94,27 +94,16 @@ fn inserting_update(action: Action, model: &mut Model) {
             }
         }
         Action::EntryDown | Action::EntryUp => {
-            match model.insert_text_area.cursor() {
-                (0, _) => {
-                    model.insert_text_area.move_cursor(CursorMove::Bottom);
-                    model.insert_text_area.move_cursor(CursorMove::End);
-                }
-                (1, _) => {
-                    model.insert_text_area.move_cursor(CursorMove::Top);
-                    model.insert_text_area.move_cursor(CursorMove::End);
-                }
-                _ => ()
-            }
+            model.insert_text_area[model.focus_insert].set_cursor_style(Style::default().fg(Color::White));
+            model.focus_insert = (model.focus_insert + 1) % 2;
+            model.insert_text_area[model.focus_insert].set_cursor_style(Style::default().bg(Color::White));
         }
         Action::Exit => {
             model.app_state = AppState::Done;
         }
         Action::Submit => {
-            let mut lines = model.insert_text_area.lines().to_owned();
-            let (command, title) = (
-                lines.pop().unwrap(),
-                lines.pop().unwrap(),
-            );
+            let title = model.insert_text_area[0].lines()[0].to_string();
+            let command = model.insert_text_area[1].lines()[0].to_string();
             let bm = Bookmark::new(title, command);
             let buffer = vec![bm];
             serde_yaml::to_writer(&model.bookmark_file, &buffer).unwrap();

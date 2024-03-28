@@ -3,7 +3,7 @@ use std::fs::File;
 use crossterm::event::KeyEvent;
 use ratatui::prelude::{Color, Style, Stylize, Text};
 use ratatui::widgets::{Block, Borders, List, ListDirection, ListState};
-use tui_textarea::{CursorMove, TextArea};
+use tui_textarea::TextArea;
 
 use crate::bookmark::Bookmark;
 
@@ -12,7 +12,8 @@ pub struct Model<'a> {
     pub app_state: AppState,
     pub command_list: StatefulList,
     pub search_text_area: TextArea<'a>,
-    pub insert_text_area: TextArea<'a>,
+    pub insert_text_area: [TextArea<'a>; 2],
+    pub focus_insert: usize,
     pub bookmark_file: File
 }
 
@@ -48,9 +49,6 @@ const BOOKMARK_FILE: &'static str = "bookmarks.yaml"; // TODO use const fn to re
 
 impl Model<'_> {
     pub fn new() -> Self {
-        let mut itext = styled_text_area();
-        itext.insert_newline();
-        itext.move_cursor(CursorMove::Top);
         Model {
             app_state: AppState::Initializing,
             command_list: StatefulList {
@@ -59,7 +57,8 @@ impl Model<'_> {
                 sorted_commands: Vec::new(),
             },
             search_text_area: styled_text_area(),
-            insert_text_area: itext,
+            insert_text_area: [styled_insert_area(), styled_insert_area()],
+            focus_insert: 0,
             bookmark_file: Self::get_bookmark_file().expect("File should exist")
         }
     }
@@ -104,8 +103,19 @@ fn styled_text_area() -> TextArea<'static> {
     let line_style = Style::default().fg(Color::White);
     ta.set_cursor_line_style(line_style);
 
-    let cursor_style = Style::default().bg(Color::White).slow_blink();
+    let cursor_style = Style::default().bg(Color::White);
     ta.set_cursor_style(cursor_style);
+
+    ta
+}
+
+fn styled_insert_area() -> TextArea<'static> {
+    let mut ta = TextArea::default();
+
+    let line_style = Style::default().fg(Color::White);
+    ta.set_cursor_line_style(line_style);
+
+    ta.set_cursor_style(Style::default().fg(Color::White));
 
     ta
 }
