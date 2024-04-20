@@ -24,11 +24,6 @@ impl Bookmark {
         }
     }
 
-    pub fn tui_text(self) -> Text<'static> { // TODO remove as no longer used
-        let mut text = Text::raw(format!("Title: {}\nCommand: {}", self.title, self.command));
-        text
-    }
-
     pub fn tui_text_fuzzy(self) -> Text<'static> {
         Text::from(
             vec!(build_highlighted_text(self.title, self.title_highlights),

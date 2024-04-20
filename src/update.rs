@@ -19,7 +19,6 @@ pub fn update(action: Action, model: &mut Model) {
                 }
                 Action::Insert => {
                     model.app_state = AppState::Inserting;
-                    // TODO get command line text and store somewhere
                 }
                 _ => ()
             }
@@ -87,7 +86,6 @@ fn inserting_update(action: Action, model: &mut Model) {
                 KeyCode::Backspace => {
                     if model.insert_text_area[1].is_empty() {
                         // TODO display some warning must not be blank. needs to be for both lines though
-                        // TODO Backspace must not delete the command line
                     }
                 }
                 _ => ()
@@ -106,7 +104,7 @@ fn inserting_update(action: Action, model: &mut Model) {
             let command = model.insert_text_area[1].lines()[0].to_string();
             let bm = Bookmark::new(title, command);
             let buffer = vec![bm];
-            serde_yaml::to_writer(&model.bookmark_file, &buffer).unwrap();
+            serde_yaml::to_writer(&model.bookmark_file, &buffer).unwrap(); // TODO yaml to json
 
             model.app_state = AppState::Done;
         }

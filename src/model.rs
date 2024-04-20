@@ -45,6 +45,7 @@ pub enum Action {
     Submit,
 }
 
+// TODO yaml to json
 const BOOKMARK_FILE: &'static str = "bookmarks.yaml"; // TODO use const fn to read config name/location?
 
 impl Model<'_> {
@@ -64,7 +65,7 @@ impl Model<'_> {
     }
 
     pub fn deserialize_commands(&mut self) {
-        self.command_list.commands = serde_yaml::from_reader(&self.bookmark_file).unwrap_or(vec![]);
+        self.command_list.commands = serde_yaml::from_reader(&self.bookmark_file).unwrap_or(vec![]); // TODO yaml to json
         self.command_list.sorted_commands = self.command_list.commands.clone();
     }
 

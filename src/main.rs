@@ -7,6 +7,7 @@ use ratatui::Terminal;
 use handle::handle;
 use model::{Action, AppState, Model};
 
+// TODO move all this shit to a lib.rs
 mod bookmark;
 mod view;
 mod update;
@@ -33,7 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if let Some(cmd) = args.get(1) {
                 model.insert_text_area[1].insert_str(cmd);
             }
-            model.insert_text_area[0].set_cursor_style(Style::default().bg(Color::White)); // TODO move to model probably?
+            model.insert_text_area[0].set_cursor_style(Style::default().bg(Color::White)); // TODO move to model?
             update::update(Action::Insert, &mut model);
         },
         _ => ()
