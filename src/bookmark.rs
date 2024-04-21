@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 pub struct Bookmark {
     pub title: String,
     pub command: String,
+    #[serde(skip)]
     pub title_highlights: Vec<usize>,
+    #[serde(skip)]
     pub command_highlights: Vec<usize>,
     id: String,
 }
