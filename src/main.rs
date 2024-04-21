@@ -31,9 +31,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         "-i" => {
             terminal = tui::init_terminal(4)?;
-            if let Some(cmd) = args.get(1) {
-                model.insert_text_area[1].insert_str(cmd);
+            let mut new_command = String::new();
+            let mut i = 1;
+            while let Some(cmd) = args.get(i) {
+                if i > 1 {
+                    new_command.push_str(" ");
+                }
+                new_command.push_str(cmd);
+                i += 1;
             }
+            model.insert_text_area[1].insert_str(new_command);
             model.insert_text_area[0].set_cursor_style(Style::default().bg(Color::White)); // TODO move to model?
             update::update(Action::Insert, &mut model);
         },
