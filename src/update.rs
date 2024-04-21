@@ -1,3 +1,5 @@
+use std::fs::File;
+
 use crossterm::event::KeyCode;
 use ratatui::prelude::Color;
 use ratatui::style::Style;
@@ -18,6 +20,7 @@ pub fn update(action: Action, model: &mut Model) {
                     model.app_state = AppState::Searching;
                 }
                 Action::Insert => {
+                    model.deserialize_commands();
                     model.app_state = AppState::Inserting;
                 }
                 _ => ()
@@ -103,8 +106,9 @@ fn inserting_update(action: Action, model: &mut Model) {
             let title = model.insert_text_area[0].lines()[0].to_string();
             let command = model.insert_text_area[1].lines()[0].to_string();
             let bm = Bookmark::new(title, command);
-            let buffer = vec![bm];
-            serde_yaml::to_writer(&model.bookmark_file, &buffer).unwrap(); // TODO yaml to json
+            model.command_list.commands.push(bm);
+            model.bookmark_file = File::create("bookmarks.json").unwrap();
+            serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
 
             model.app_state = AppState::Done;
         }
