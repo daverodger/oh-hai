@@ -8,7 +8,8 @@ __crabmark_save__() {
 __crabmark_search__() {
   local output
   query=$(echo "${READLINE_LINE:0}" | grep -oE '(.)+$')
-  output=$(./target/debug/crabmark -s "$query")
+  ./target/debug/crabmark -s "$query"
+  output=$(cat ".command.txt");
   READLINE_LINE=${output}
   READLINE_POINT=0x7fffffff
 }

@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::io::Write;
 
 use crossterm::event::KeyCode;
 use ratatui::prelude::Color;
@@ -70,10 +71,15 @@ fn searching_update(action: Action, model: &mut Model) {
             });
         }
         Action::Exit => {
+            let _ = File::create(".command.txt");
             model.app_state = AppState::Done;
         }
         Action::Submit => {
-            // TODO output search_text_area somehow for use by bash script
+            let mut file = File::create(".command.txt").unwrap();
+            let idx = &model.command_list.state.selected().unwrap();
+            let selected_command = &model.command_list.sorted_commands.get(idx.clone()).unwrap().command;
+            file.write(selected_command.as_bytes()).unwrap();
+
             model.app_state = AppState::Done;
         }
         _ => ()
