@@ -1,7 +1,8 @@
 use std::fs::File;
 use std::io::Write;
 
-use crossterm::event::KeyCode;
+use crossterm::event;
+use crossterm::event::{Event, KeyCode};
 use ratatui::prelude::Color;
 use ratatui::style::Style;
 
@@ -76,11 +77,19 @@ fn searching_update(action: Action, model: &mut Model) {
         }
         Action::Submit => {
             let mut file = File::create(".command.txt").unwrap();
-            let idx = &model.command_list.state.selected().unwrap();
-            let selected_command = &model.command_list.sorted_commands.get(idx.clone()).unwrap().command;
+            let selected_command = &model.command_list.sorted_commands.get(model.get_selected_index()).unwrap().command;
             file.write(selected_command.as_bytes()).unwrap();
 
             model.app_state = AppState::Done;
+        }
+        Action::Delete => {
+            if let Event::Key(key) = event::read().ok().unwrap() {
+                if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
+                    let _ = &model.command_list.sorted_commands.remove(model.get_selected_index());
+                    model.bookmark_file = File::create("bookmarks.json").unwrap();
+                    serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.sorted_commands).unwrap();
+                }
+            }
         }
         _ => ()
     }

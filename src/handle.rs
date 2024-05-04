@@ -1,16 +1,17 @@
-use crossterm::event::{self, KeyCode, KeyEventKind};
+use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers, poll};
 
 use crate::model::Action;
 
 pub fn handle() -> Option<Action> {
-    if event::poll(std::time::Duration::from_millis(16)).ok()? {
-        if let event::Event::Key(key) = event::read().ok()? {
+    if poll(std::time::Duration::from_millis(16)).ok()? {
+        if let Event::Key(key) = event::read().ok()? {
             if key.kind == KeyEventKind::Press {
-                return match key.code {
-                    KeyCode::Down | KeyCode::Tab => Some(Action::EntryDown),
-                    KeyCode::Up | KeyCode::BackTab => Some(Action::EntryUp),
-                    KeyCode::Esc => Some(Action::Exit),
-                    KeyCode::Enter => Some(Action::Submit),
+                return match (key.code, key.modifiers) {
+                    (KeyCode::Down, _) | (KeyCode::Tab, _) => Some(Action::EntryDown),
+                    (KeyCode::Up, _) | (KeyCode::BackTab, _) => Some(Action::EntryUp),
+                    (KeyCode::Esc, _) => Some(Action::Exit),
+                    (KeyCode::Enter, _) => Some(Action::Submit),
+                    (KeyCode::Char('d'), KeyModifiers::CONTROL) => return Some(Action::Delete),
                     _ => Some(Action::KeyInput(key))
                 };
             }
