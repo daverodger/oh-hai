@@ -94,6 +94,10 @@ impl Model<'_> {
     pub fn sorted_command_len(&self) -> usize {
         self.command_list.sorted_commands.len()
     }
+
+    pub fn get_selected_index(&self) -> usize {
+        self.command_list.state.selected().unwrap()
+    }
 }
 
 fn styled_text_area() -> TextArea<'static> {
