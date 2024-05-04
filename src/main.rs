@@ -1,8 +1,11 @@
+use std::fs::File;
 use std::io::stdout;
+use std::sync::Arc;
 
 use ratatui::backend::CrosstermBackend;
 use ratatui::prelude::{Color, Style};
 use ratatui::Terminal;
+use tracing_subscriber::{filter, prelude::*};
 
 use handle::handle;
 use model::{Action, AppState, Model};
@@ -16,8 +19,11 @@ mod tui;
 mod model;
 mod matcher;
 
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+    let log_file = File::create("debug.log")?;
+    let debug_log = tracing_subscriber::fmt::layer().with_writer(Arc::new(log_file)).pretty();
+    tracing_subscriber::registry().with(debug_log.with_filter(filter::LevelFilter::DEBUG)).init();
 
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
