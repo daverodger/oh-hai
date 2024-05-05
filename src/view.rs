@@ -1,9 +1,10 @@
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout};
-use ratatui::prelude::Line;
+use ratatui::prelude::*;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::model::{AppState, Model};
+use crate::popup;
 
 pub fn view(frame: &mut Frame, model: &mut Model) {
     match model.app_state {
@@ -79,6 +80,35 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 model.insert_text_area[1].widget(),
                 cmd_row[1],
             );
+        }
+        AppState::Deleting => {
+            let layout = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints(vec![Constraint::Max(1), Constraint::Min(2)])
+                .split(frame.size());
+
+            frame.render_widget(
+                model.search_text_area.widget(),
+                layout[0],
+            );
+
+            frame.render_stateful_widget(
+                Model::get_command_list(model.command_list.sorted_commands.clone()),
+                layout[1],
+                &mut model.command_list.state,
+            );
+
+            let popup = popup::Popup::default()
+                .content("Delete this entry? (y/n)")
+                .style(Style::new().light_yellow())
+                .border_style(Style::new().light_red());
+            let popup_area = Rect {
+                x: frame.size().x,
+                y: frame.size().y,
+                width: frame.size().width,
+                height: 3
+            };
+            frame.render_widget(popup, popup_area);
         }
         _ => ()
     }

@@ -18,6 +18,7 @@ mod handle;
 mod tui;
 mod model;
 mod matcher;
+mod popup;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 

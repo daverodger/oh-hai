@@ -29,7 +29,8 @@ pub enum AppState {
     Searching,
     Inserting,
     Done,
-    Initializing
+    Initializing,
+    Deleting,
 }
 
 #[derive(PartialEq)]

@@ -1,9 +1,8 @@
 use std::fs::File;
 use std::io::Write;
 
-use crossterm::event;
-use crossterm::event::{Event, KeyCode};
-use ratatui::prelude::Color;
+use crossterm::event::KeyCode;
+use ratatui::prelude::*;
 use ratatui::style::Style;
 
 use crate::bookmark::Bookmark;
@@ -14,6 +13,7 @@ pub fn update(action: Action, model: &mut Model) {
     match model.app_state {
         AppState::Searching => searching_update(action, model),
         AppState::Inserting => inserting_update(action, model),
+        AppState::Deleting => delete_popup_update(action, model),
         AppState::Initializing => {
             match action {
                 Action::Search => {
@@ -83,13 +83,7 @@ fn searching_update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Delete => {
-            if let Event::Key(key) = event::read().ok().unwrap() {
-                if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
-                    let _ = &model.command_list.sorted_commands.remove(model.get_selected_index());
-                    model.bookmark_file = File::create("bookmarks.json").unwrap();
-                    serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.sorted_commands).unwrap();
-                }
-            }
+            model.app_state = AppState::Deleting;
         }
         _ => ()
     }
@@ -129,4 +123,15 @@ fn inserting_update(action: Action, model: &mut Model) {
         }
         _ => ()
     }
+}
+
+fn delete_popup_update(action: Action, model: &mut Model) {
+    if let Action::KeyInput(key) = action {
+        if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
+            let _ = &model.command_list.sorted_commands.remove(model.get_selected_index());
+            model.bookmark_file = File::create("bookmarks.json").unwrap();
+            serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.sorted_commands).unwrap();
+        }
+    }
+    model.app_state = AppState::Searching;
 }
