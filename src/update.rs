@@ -2,8 +2,6 @@ use std::fs::File;
 use std::io::Write;
 
 use crossterm::event::KeyCode;
-use ratatui::prelude::*;
-use ratatui::style::Style;
 
 use crate::bookmark::Bookmark;
 use crate::matcher;
@@ -97,16 +95,14 @@ fn inserting_update(action: Action, model: &mut Model) {
             match key.code {
                 KeyCode::Backspace => {
                     if model.insert_text_area[1].is_empty() {
-                        // TODO display some warning must not be blank. needs to be for both lines though
+                        // TODO display some warning must not be blank. needs to be for both lines
                     }
                 }
                 _ => ()
             }
         }
         Action::EntryDown | Action::EntryUp => {
-            model.insert_text_area[model.focus_insert].set_cursor_style(Style::default().fg(Color::White));
             model.focus_insert = (model.focus_insert + 1) % 2;
-            model.insert_text_area[model.focus_insert].set_cursor_style(Style::default().bg(Color::White));
         }
         Action::Exit => {
             model.app_state = AppState::Done;

@@ -57,8 +57,8 @@ impl Model<'_> {
                 commands: Vec::new(),
                 sorted_commands: Vec::new(),
             },
-            search_text_area: styled_text_area(),
-            insert_text_area: [styled_insert_area(), styled_insert_area()],
+            search_text_area: TextArea::default(),
+            insert_text_area: [TextArea::default(), TextArea::default()],
             focus_insert: 0,
             bookmark_file: Self::get_bookmark_file().expect("File should exist")
         }
@@ -99,27 +99,4 @@ impl Model<'_> {
     pub fn get_selected_index(&self) -> usize {
         self.command_list.state.selected().unwrap()
     }
-}
-
-fn styled_text_area() -> TextArea<'static> {
-    let mut ta = TextArea::default();
-
-    let line_style = Style::default().fg(Color::White);
-    ta.set_cursor_line_style(line_style);
-
-    let cursor_style = Style::default().bg(Color::White);
-    ta.set_cursor_style(cursor_style);
-
-    ta
-}
-
-fn styled_insert_area() -> TextArea<'static> {
-    let mut ta = TextArea::default();
-
-    let line_style = Style::default().fg(Color::White);
-    ta.set_cursor_line_style(line_style);
-
-    ta.set_cursor_style(Style::default().fg(Color::White));
-
-    ta
 }
