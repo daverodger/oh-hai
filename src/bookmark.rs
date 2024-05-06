@@ -26,13 +26,21 @@ impl Bookmark {
     }
 
     pub fn tui_text_fuzzy(self) -> Text<'static> {
-        Text::from(
+        let mut text = Text::from(
             vec!(build_highlighted_text(self.title, self.title_highlights),
                  build_highlighted_text(self.command, self.command_highlights)
             )
-        )
-    }
+        );
 
+        // add command prefix symbol
+        text
+            .lines
+            .get_mut(1)
+            .expect("Second line should exist since we just built it")
+            .spans
+            .insert(0, Span::from(crate::view::COMMAND_PREFIX.to_string()));
+        text
+    }
 }
 
 pub fn build_highlighted_text(s: String, arr: Vec<usize>) -> Line<'static> {

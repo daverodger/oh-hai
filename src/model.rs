@@ -73,7 +73,7 @@ impl Model<'_> {
         self.command_list.state.select(Some(0));
     }
 
-    pub fn get_command_list(bookmarks: Vec<Bookmark>) -> List<'static> {
+    pub fn get_fuzzied_cmd_list(bookmarks: Vec<Bookmark>) -> List<'static> {
         List::new(bookmarks.into_iter().map(|x| x.tui_text_fuzzy()).collect::<Vec<Text>>())
     }
 

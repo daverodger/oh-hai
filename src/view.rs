@@ -6,6 +6,7 @@ use ratatui::widgets::{Block, Borders, ListDirection, Paragraph};
 use crate::model::{AppState, Model};
 
 pub const HIGHLIGHT_COLOR: Style = Style::new().fg(Color::Rgb(204, 51, 102));
+pub const COMMAND_PREFIX: char = '>';
 
 pub fn view(frame: &mut Frame, model: &mut Model) {
     match &model.app_state {
@@ -33,7 +34,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             }
 
             // Get and style command list
-            let cmd_list = Model::get_command_list(model.command_list.sorted_commands.clone())
+            let cmd_list = Model::get_fuzzied_cmd_list(model.command_list.sorted_commands.clone())
                 .block(Block::default().title(format!("{} Command(s)", model.command_list.sorted_commands.len())).borders(Borders::ALL))
                 .white()
                 .highlight_style(Style::default().bg(Color::DarkGray))
