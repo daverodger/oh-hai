@@ -1,8 +1,8 @@
 use std::fs::File;
 
 use crossterm::event::KeyEvent;
-use ratatui::prelude::{Color, Style, Stylize, Text};
-use ratatui::widgets::{Block, Borders, List, ListDirection, ListState};
+use ratatui::prelude::Text;
+use ratatui::widgets::{List, ListState};
 use tui_textarea::TextArea;
 
 use crate::bookmark::Bookmark;
@@ -74,13 +74,7 @@ impl Model<'_> {
     }
 
     pub fn get_command_list(bookmarks: Vec<Bookmark>) -> List<'static> {
-        let len = bookmarks.len();
         List::new(bookmarks.into_iter().map(|x| x.tui_text_fuzzy()).collect::<Vec<Text>>())
-            .block(Block::default().title(format!("{} Command(s)", len)).borders(Borders::ALL))
-            .white()
-            .highlight_style(Style::default().bg(Color::DarkGray))
-            .highlight_symbol(">>")
-            .direction(ListDirection::TopToBottom)
     }
 
     fn get_bookmark_file() -> Result<File, Box<dyn std::error::Error>> {

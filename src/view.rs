@@ -1,7 +1,7 @@
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout};
 use ratatui::prelude::*;
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders, ListDirection, Paragraph};
 
 use crate::model::{AppState, Model};
 
@@ -13,10 +13,9 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 .constraints(vec![Constraint::Max(1), Constraint::Min(2)])
                 .split(frame.size());
 
-            // Search Style
+            // Search text area style
             model.search_text_area.set_cursor_line_style(Style::default().fg(Color::White));
             model.search_text_area.set_cursor_style(Style::default().bg(Color::White));
-
 
             if *state == AppState::Deleting {
                 frame.render_widget(
@@ -31,8 +30,16 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 );
             }
 
+            // Get and style command list
+            let cmd_list = Model::get_command_list(model.command_list.sorted_commands.clone())
+                .block(Block::default().title(format!("{} Command(s)", model.command_list.sorted_commands.len())).borders(Borders::ALL))
+                .white()
+                .highlight_style(Style::default().bg(Color::DarkGray))
+                // .highlight_symbol(">>")
+                .direction(ListDirection::TopToBottom);
+
             frame.render_stateful_widget(
-                Model::get_command_list(model.command_list.sorted_commands.clone()),
+                cmd_list,
                 layout[1],
                 &mut model.command_list.state,
             );
