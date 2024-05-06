@@ -5,6 +5,8 @@ use ratatui::widgets::{Block, Borders, ListDirection, Paragraph};
 
 use crate::model::{AppState, Model};
 
+pub const HIGHLIGHT_COLOR: Style = Style::new().fg(Color::Rgb(204, 51, 102));
+
 pub fn view(frame: &mut Frame, model: &mut Model) {
     match &model.app_state {
         state @ AppState::Searching | state @ AppState::Deleting => {
@@ -112,16 +114,3 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
     }
 }
 
-pub fn build_highlighted_text(s: String, arr: Vec<usize>) -> Line<'static> {
-    let mut line = Vec::new();
-    let mut arr = arr;
-    for c in s.char_indices() {
-        if !arr.is_empty() && arr[0] == c.0 {
-            arr.remove(0);
-            line.push(Span::styled(c.1.to_string(), Style::new().fg(Color::Rgb(204,51,102))));
-        } else {
-            line.push(Span::raw(c.1.to_string()));
-        }
-    }
-    Line::from(line)
-}
