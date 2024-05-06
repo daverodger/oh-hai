@@ -3,7 +3,6 @@ use std::io::stdout;
 use std::sync::Arc;
 
 use ratatui::backend::CrosstermBackend;
-use ratatui::prelude::{Color, Style};
 use ratatui::Terminal;
 use tracing_subscriber::{filter, prelude::*};
 
@@ -39,7 +38,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 i += 1;
             }
             model.insert_text_area[1].insert_str(new_command);
-            model.insert_text_area[0].set_cursor_style(Style::default().bg(Color::White)); // TODO move to model?
             update::update(Action::Insert, &mut model);
         },
         _ => ()
