@@ -7,18 +7,9 @@ use ratatui::prelude::{Color, Style};
 use ratatui::Terminal;
 use tracing_subscriber::{filter, prelude::*};
 
+use crabmark::*;
 use handle::handle;
-use model::{Action, AppState, Model};
-
-// TODO move all this shit to a lib.rs
-mod bookmark;
-mod view;
-mod update;
-mod handle;
-mod tui;
-mod model;
-mod matcher;
-mod popup;
+use model::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
