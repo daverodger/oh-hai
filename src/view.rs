@@ -46,11 +46,19 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 &mut model.command_list.state,
             );
         }
-        AppState::Inserting => {
-            let block = Block::default()
-                .title("New Command")
+        state @ AppState::Inserting | state @ AppState::PendingInsert => {
+            let mut block = Block::default()
                 .title_alignment(Alignment::Center)
                 .borders(Borders::ALL);
+
+            if *state == AppState::Inserting {
+                block = block
+                    .title("New Command");
+            } else {
+                block = block
+                    .title("Save with blank fields? (y/n)")
+                    .style(Style::default().light_yellow());
+            }
 
             let outer_layout = Layout::default()
                 .direction(Direction::Vertical)

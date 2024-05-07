@@ -31,6 +31,7 @@ pub enum AppState {
     Done,
     Initializing,
     Deleting,
+    PendingInsert,
 }
 
 #[derive(PartialEq)]

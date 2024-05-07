@@ -12,6 +12,7 @@ pub fn update(action: Action, model: &mut Model) {
         AppState::Searching => searching_update(action, model),
         AppState::Inserting => inserting_update(action, model),
         AppState::Deleting => delete_popup_update(action, model),
+        AppState::PendingInsert => confirm_insert(action, model),
         AppState::Initializing => {
             match action {
                 Action::Search => {
@@ -99,14 +100,11 @@ fn inserting_update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Submit => {
-            let title = model.insert_text_area[0].lines()[0].to_string();
-            let command = model.insert_text_area[1].lines()[0].to_string();
-            let bm = Bookmark::new(title, command);
-            model.command_list.commands.push(bm);
-            model.bookmark_file = File::create("bookmarks.json").unwrap();
-            serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
-
-            model.app_state = AppState::Done;
+            if model.insert_text_area[0].is_empty() || model.insert_text_area[1].is_empty() {
+                model.app_state = AppState::PendingInsert;
+            } else {
+                insert_bookmark(model);
+            }
         }
         _ => ()
     }
@@ -121,4 +119,26 @@ fn delete_popup_update(action: Action, model: &mut Model) {
         }
     }
     model.app_state = AppState::Searching;
+}
+
+fn confirm_insert(action: Action, model: &mut Model) {
+    if let Action::KeyInput(key) = action {
+        if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
+            insert_bookmark(model);
+        } else {
+            model.app_state = AppState::Inserting;
+        }
+    } else {
+        model.app_state = AppState::Inserting;
+    }
+}
+
+fn insert_bookmark(model: &mut Model) {
+    let title = model.insert_text_area[0].lines()[0].to_string();
+    let command = model.insert_text_area[1].lines()[0].to_string();
+    let bm = Bookmark::new(title, command);
+    model.command_list.commands.push(bm);
+    model.bookmark_file = File::create("bookmarks.json").unwrap();
+    serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
+    model.app_state = AppState::Done;
 }
