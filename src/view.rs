@@ -38,7 +38,6 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 .block(Block::default().title(format!("{} Command(s)", model.command_list.sorted_commands.len())).borders(Borders::ALL))
                 .white()
                 .highlight_style(Style::default().bg(Color::DarkGray))
-                // .highlight_symbol(">>")
                 .direction(ListDirection::TopToBottom);
 
             frame.render_stateful_widget(
