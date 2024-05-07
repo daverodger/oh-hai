@@ -91,15 +91,6 @@ fn inserting_update(action: Action, model: &mut Model) {
     match action {
         Action::KeyInput(key) => {
             model.insert_text_area[model.focus_insert].input(key);
-            // TODO warn if duplicate name or command
-            match key.code {
-                KeyCode::Backspace => {
-                    if model.insert_text_area[1].is_empty() {
-                        // TODO display some warning must not be blank. needs to be for both lines
-                    }
-                }
-                _ => ()
-            }
         }
         Action::EntryDown | Action::EntryUp => {
             model.focus_insert = (model.focus_insert + 1) % 2;
