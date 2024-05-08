@@ -3,7 +3,7 @@ use ratatui::layout::{Alignment, Constraint, Direction, Layout};
 use ratatui::prelude::*;
 use ratatui::widgets::{Block, Borders, ListDirection, Paragraph};
 
-use crate::model::{AppState, Model};
+use crate::model::{AppState, InsertState, Model};
 
 pub const HIGHLIGHT_COLOR: Style = Style::new().fg(Color::Rgb(204, 51, 102));
 pub const COMMAND_PREFIX: char = '>';
@@ -23,9 +23,8 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             if *state == AppState::Deleting {
                 frame.render_widget(
                     "Delete selected entry? (y/n)".light_yellow(),
-                    layout[0]
+                    layout[0],
                 );
-
             } else {
                 frame.render_widget(
                     model.search_text_area.widget(),
@@ -46,18 +45,24 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 &mut model.command_list.state,
             );
         }
-        state @ AppState::Inserting | state @ AppState::PendingInsert => {
+        AppState::Inserting(insert_state) => {
             let mut block = Block::default()
                 .title_alignment(Alignment::Center)
                 .borders(Borders::ALL);
 
-            if *state == AppState::Inserting {
-                block = block
-                    .title("New Command");
-            } else {
-                block = block
-                    .title("Save with blank fields? (y/n)")
-                    .style(Style::default().light_yellow());
+            match insert_state {
+                InsertState::Unchecked => {
+                    block = block
+                        .title("New Command")
+                }
+                InsertState::Blank => {
+                    block = block
+                        .title("Save with blank fields? (y/n)")
+                        .style(Style::default().light_yellow());
+                }
+                InsertState::Duplicate => {
+                    todo!()
+                }
             }
 
             let outer_layout = Layout::default()

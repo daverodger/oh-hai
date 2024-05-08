@@ -27,11 +27,17 @@ pub struct StatefulList {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum AppState {
     Searching,
-    Inserting,
+    Inserting(InsertState),
     Done,
     Initializing,
     Deleting,
-    PendingInsert,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum InsertState {
+    Unchecked,
+    Blank,
+    Duplicate
 }
 
 #[derive(PartialEq)]

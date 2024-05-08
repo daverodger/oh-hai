@@ -5,14 +5,14 @@ use crossterm::event::KeyCode;
 
 use crate::bookmark::Bookmark;
 use crate::matcher;
-use crate::model::{Action, AppState, Model};
+use crate::model::{Action, AppState, InsertState, Model};
 
 pub fn update(action: Action, model: &mut Model) {
     match model.app_state {
         AppState::Searching => searching_update(action, model),
-        AppState::Inserting => inserting_update(action, model),
+        AppState::Inserting(InsertState::Unchecked) => inserting_update(action, model),
+        AppState::Inserting(_)=> confirm_insert(action, model),
         AppState::Deleting => delete_popup_update(action, model),
-        AppState::PendingInsert => confirm_insert(action, model),
         AppState::Initializing => {
             match action {
                 Action::Search => {
@@ -22,7 +22,7 @@ pub fn update(action: Action, model: &mut Model) {
                 }
                 Action::Insert => {
                     model.deserialize_commands();
-                    model.app_state = AppState::Inserting;
+                    model.app_state = AppState::Inserting(InsertState::Unchecked);
                 }
                 _ => ()
             }
@@ -99,9 +99,9 @@ fn inserting_update(action: Action, model: &mut Model) {
         Action::Exit => {
             model.app_state = AppState::Done;
         }
-        Action::Submit => {
+        Action::Submit => { // TODO logic for duplicates
             if model.insert_text_area[0].is_empty() || model.insert_text_area[1].is_empty() {
-                model.app_state = AppState::PendingInsert;
+                model.app_state = AppState::Inserting(InsertState::Blank);
             } else {
                 insert_bookmark(model);
             }
@@ -125,11 +125,9 @@ fn confirm_insert(action: Action, model: &mut Model) {
     if let Action::KeyInput(key) = action {
         if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
             insert_bookmark(model);
-        } else {
-            model.app_state = AppState::Inserting;
         }
     } else {
-        model.app_state = AppState::Inserting;
+        model.app_state = AppState::Inserting(InsertState::Unchecked);
     }
 }
 
