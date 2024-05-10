@@ -16,6 +16,8 @@ pub struct Bookmark {
 
 impl Bookmark {
     pub fn new(title: String, command: String) -> Self {
+        let title = title.trim().to_string();
+        let command = command.trim().to_string();
         Bookmark {
             title,
             command,
@@ -40,6 +42,15 @@ impl Bookmark {
             .spans
             .insert(0, Span::from(crate::view::COMMAND_PREFIX.to_string()));
         text
+    }
+}
+
+impl PartialEq for Bookmark {
+    fn eq(&self, other: &Self) -> bool {
+        if other.title == self.title || other.command == self.command {
+            return true
+        }
+        false
     }
 }
 

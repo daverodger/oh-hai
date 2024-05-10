@@ -61,7 +61,9 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                         .style(Style::default().light_yellow());
                 }
                 InsertState::Duplicate => {
-                    todo!()
+                    block = block
+                        .title("Duplicate title or command exists. Save anyway? (y/n)")
+                        .style(Style::default().light_yellow());
                 }
             }
 
