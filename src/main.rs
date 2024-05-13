@@ -6,9 +6,9 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use tracing_subscriber::{filter, prelude::*};
 
-use crabmark::*;
 use handle::handle;
 use model::*;
+use oh_hai::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
