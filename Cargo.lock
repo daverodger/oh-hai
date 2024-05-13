@@ -82,22 +82,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "crabmark"
-version = "0.1.0"
-dependencies = [
- "crossterm",
- "derive_setters",
- "fuzzy-matcher",
- "nanoid",
- "ratatui",
- "serde",
- "serde_json",
- "tracing",
- "tracing-subscriber",
- "tui-textarea",
-]
-
-[[package]]
 name = "crossterm"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -316,6 +300,22 @@ checksum = "77a8165726e8236064dbb45459242600304b42a5ea24ee2948e18e023bf7ba84"
 dependencies = [
  "overload",
  "winapi",
+]
+
+[[package]]
+name = "oh-hai"
+version = "0.1.0"
+dependencies = [
+ "crossterm",
+ "derive_setters",
+ "fuzzy-matcher",
+ "nanoid",
+ "ratatui",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "tui-textarea",
 ]
 
 [[package]]
