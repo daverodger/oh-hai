@@ -6,6 +6,7 @@ use ratatui::widgets::{List, ListState};
 use tui_textarea::TextArea;
 
 use crate::bookmark::Bookmark;
+use crate::config;
 
 #[derive(Debug)]
 pub struct Model<'a> {
@@ -14,7 +15,7 @@ pub struct Model<'a> {
     pub search_text_area: TextArea<'a>,
     pub insert_text_area: [TextArea<'a>; 2],
     pub focus_insert: usize,
-    pub bookmark_file: File
+    pub bookmark_file: File,
 }
 
 #[derive(Debug, Clone)]
@@ -37,7 +38,7 @@ pub enum AppState {
 pub enum InsertState {
     Unchecked,
     Blank,
-    Duplicate
+    Duplicate,
 }
 
 #[derive(PartialEq)]
@@ -53,10 +54,14 @@ pub enum Action {
     Submit,
 }
 
-const BOOKMARK_FILE: &'static str = "bookmarks.json"; // TODO use const fn to read config name/location?
-
 impl Model<'_> {
     pub fn new() -> Self {
+        let bookmark_file = File::options()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(config::get_data_file_path().as_path()).unwrap(); // TODO will fail if dir does not exist
+
         Model {
             app_state: AppState::Initializing,
             command_list: StatefulList {
@@ -67,7 +72,7 @@ impl Model<'_> {
             search_text_area: TextArea::default(),
             insert_text_area: [TextArea::default(), TextArea::default()],
             focus_insert: 0,
-            bookmark_file: Self::get_bookmark_file().expect("File should exist")
+            bookmark_file,
         }
     }
 
@@ -82,15 +87,6 @@ impl Model<'_> {
 
     pub fn get_fuzzied_cmd_list(bookmarks: Vec<Bookmark>) -> List<'static> {
         List::new(bookmarks.into_iter().map(|x| x.tui_text_fuzzy()).collect::<Vec<Text>>())
-    }
-
-    fn get_bookmark_file() -> Result<File, Box<dyn std::error::Error>> {
-        let bookmark_file = File::options()
-            .read(true)
-            .write(true)
-            .create(true)
-            .open(BOOKMARK_FILE)?;
-        Ok(bookmark_file)
     }
 
     pub fn sorted_command_len(&self) -> usize {

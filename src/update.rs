@@ -3,8 +3,8 @@ use std::io::Write;
 
 use crossterm::event::KeyCode;
 
+use crate::{config, matcher};
 use crate::bookmark::Bookmark;
-use crate::matcher;
 use crate::model::{Action, AppState, InsertState, Model};
 
 pub fn update(action: Action, model: &mut Model) {
@@ -117,7 +117,7 @@ fn delete_popup_update(action: Action, model: &mut Model) {
         if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
             let _ = &model.command_list.sorted_commands.remove(model.get_selected_index());
             let _ = &model.command_list.commands.remove(model.get_selected_index());
-            model.bookmark_file = File::create("bookmarks.json").unwrap();
+            model.bookmark_file = File::create(config::get_data_file_path().as_path()).unwrap();
             serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
         }
     }
@@ -137,7 +137,7 @@ fn confirm_insert(action: Action, model: &mut Model) {
 fn insert_bookmark(model: &mut Model) {
     let bm = create_bookmark_from_model(model);
     model.command_list.commands.push(bm);
-    model.bookmark_file = File::create("bookmarks.json").unwrap();
+    model.bookmark_file = File::create(config::get_data_file_path().as_path()).unwrap();
     serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
     model.app_state = AppState::Done;
 }

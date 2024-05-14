@@ -6,3 +6,4 @@ pub mod tui;
 pub mod model;
 pub mod matcher;
 pub mod popup;
+pub mod config;

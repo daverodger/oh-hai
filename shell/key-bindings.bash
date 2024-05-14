@@ -1,6 +1,6 @@
 __crabmark_save__() {
   command=$(echo "${READLINE_LINE:0}" | grep -oE '(.)+$')
-  ./target/debug/crabmark -i "$command"
+  oh-hai -i "$command"
   READLINE_LINE=""
   READLINE_POINT=0x7fffffff
 }
@@ -8,7 +8,7 @@ __crabmark_save__() {
 __crabmark_search__() {
   local output
   query=$(echo "${READLINE_LINE:0}" | grep -oE '(.)+$')
-  ./target/debug/crabmark -s "$query"
+  oh-hai -s "$query"
   output=$(cat ".command.txt");
   READLINE_LINE=${output}
   READLINE_POINT=0x7fffffff

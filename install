@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-DATA_DIR="$HOME/.tbmk"
+APP_DIR=$(pwd)
+DATA_DIR="$APP_DIR/data"
 mkdir -p $DATA_DIR
 
-APP_DIR=$(pwd)
-echo "Create symlink /usr/local/bin/tbmk"
-sudo ln -sf "$APP_DIR/tbmk" /usr/local/bin/tbmk
+echo "Create symlink /usr/local/bin/oh-hai"
+sudo ln -sf "$APP_DIR/oh-hai" /usr/local/bin/oh-hai
 
 # for bash
 FILE_BASHRC=~/.bashrc
