@@ -2,7 +2,8 @@
 
 APP_DIR=$(pwd)
 DATA_DIR="$APP_DIR/data"
-mkdir -p $DATA_DIR
+mkdir -p "$DATA_DIR"
+./config "$DATA_DIR/bookmarks.json"
 
 echo "Create symlink /usr/local/bin/oh-hai"
 sudo ln -sf "$APP_DIR/oh-hai" /usr/local/bin/oh-hai
@@ -12,13 +13,13 @@ FILE_BASHRC=~/.bashrc
 if [ -f "$FILE_BASHRC" ]; then
   BASH_SCRIPT_KEYBINDING="$APP_DIR/shell/key-bindings.bash"
   RC_FILE="$DATA_DIR/.bash"
-  tee $RC_FILE > /dev/null <<EOT
+  tee "$RC_FILE" > /dev/null <<EOT
 if [ -f '$BASH_SCRIPT_KEYBINDING' ]; then
 . '$BASH_SCRIPT_KEYBINDING'
 fi
 EOT
   SOURCE_STR="[ -f $RC_FILE ] && source $RC_FILE"
-  SOURCE_STR_ESCAPED=$(echo $SOURCE_STR | sed 's/[][\\.*^$\-\/]/\\&/g')
+  SOURCE_STR_ESCAPED=$(echo "$SOURCE_STR" | sed 's/[][\\.*^$\-\/]/\\&/g')
   if ! grep -q "^$SOURCE_STR_ESCAPED" $FILE_BASHRC ; then
     printf "\n$SOURCE_STR" >> $FILE_BASHRC
   fi
@@ -46,7 +47,7 @@ fi
 #fi
 
 # TODO for fish
-#FILE_FISHRC=~/.config/fish/config.fish
+#FILE_FISHRC=~/.bin/fish/bin.fish
 #if [ -f "$FILE_FISHRC" ]; then
 #  FISH_SCRIPT_KEYBINDING="$APP_DIR/shell/key-bindings.fish"
 #  RC_FILE="$DATA_DIR/.fish"
@@ -66,4 +67,4 @@ fi
 #fi
 
 echo 'Installation done.'
-echo 'Restart your shell or reload config file.'
+echo 'Restart your shell or reload bin file.'
