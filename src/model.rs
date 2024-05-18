@@ -60,7 +60,7 @@ impl Model<'_> {
             .read(true)
             .write(true)
             .create(true)
-            .open(config::get_data_file_path().as_path()).unwrap(); // TODO will fail if dir does not exist
+            .open(config::get_data_file_path().as_path()).unwrap();
 
         Model {
             app_state: AppState::Initializing,
