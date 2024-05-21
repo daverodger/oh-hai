@@ -77,7 +77,7 @@ impl Model<'_> {
     }
 
     pub fn deserialize_commands(&mut self) {
-        self.command_list.commands = serde_json::from_reader(&self.bookmark_file).unwrap_or(vec![]);
+        self.command_list.commands = serde_json::from_reader(&self.bookmark_file).expect("unable to parse bookmarks.json"); // TODO breaks shit
         self.command_list.sorted_commands = self.command_list.commands.clone();
     }
 

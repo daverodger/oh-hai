@@ -5,7 +5,7 @@ use ratatui::widgets::{Block, Borders, ListDirection, Paragraph};
 
 use crate::model::{AppState, InsertState, Model};
 
-pub const HIGHLIGHT_COLOR: Style = Style::new().fg(Color::Rgb(204, 51, 102));
+pub const HIGHLIGHT_COLOR: Style = Style::new().fg(Color::LightGreen);
 pub const COMMAND_PREFIX: char = '>';
 
 pub fn view(frame: &mut Frame, model: &mut Model) {
@@ -17,12 +17,13 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 .split(frame.size());
 
             // Search text area style
-            model.search_text_area.set_cursor_line_style(Style::default().fg(Color::White));
-            model.search_text_area.set_cursor_style(Style::default().bg(Color::White));
+            model.search_text_area.set_cursor_line_style(Style::default().white().on_black());
+            model.search_text_area.set_cursor_style(Style::default().on_white().slow_blink());
+            model.search_text_area.set_block(Block::default().white().on_black());
 
             if *state == AppState::Deleting {
                 frame.render_widget(
-                    "Delete selected entry? (y/n)".light_yellow(),
+                    "Delete selected entry? (y/n)".light_yellow().on_black(),
                     layout[0],
                 );
             } else {
@@ -36,6 +37,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             let cmd_list = Model::get_fuzzied_cmd_list(model.command_list.sorted_commands.clone())
                 .block(Block::default().title(format!("{} Command(s)", model.command_list.sorted_commands.len())).borders(Borders::ALL))
                 .white()
+                .on_black()
                 .highlight_style(Style::default().bg(Color::DarkGray))
                 .direction(ListDirection::TopToBottom);
 
@@ -54,16 +56,20 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 InsertState::Unchecked => {
                     block = block
                         .title("New Command")
+                        .white()
+                        .on_black();
                 }
                 InsertState::Blank => {
                     block = block
                         .title("Save with blank fields? (y/n)")
-                        .style(Style::default().light_yellow());
+                        .light_yellow()
+                        .on_black();
                 }
                 InsertState::Duplicate => {
                     block = block
                         .title("Duplicate title or command exists. Save anyway? (y/n)")
-                        .style(Style::default().light_yellow());
+                        .light_yellow()
+                        .on_black();
                 }
             }
 
