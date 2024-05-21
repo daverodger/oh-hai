@@ -1,7 +1,9 @@
 # oh-hai
 
 ---
-A terminal command bookmarking tool written in Rust and heavily inspired by [tbmk](https://github.com/linhx/tbmk)
+A terminal command bookmarking tool written in Rust using [ratatui](https://github.com/ratatui-org/ratatui).
+
+Heavily inspired by [tbmk](https://github.com/linhx/tbmk).
 
 ## Usage
 
@@ -21,6 +23,6 @@ The command-line buffer is copied into the search field (search mode) or the com
 2. cd into the directory and run `./install`
 3. Restart shell or source config file
 
-Bookmarks are saved into the extracted directory in `data/bookmarks.json`.
+Bookmarks are saved into `./data/bookmarks.json`.
 
 If you need to move the directory run `./install` again after moving.
