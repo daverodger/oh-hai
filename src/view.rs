@@ -17,9 +17,21 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 .split(frame.size());
 
             // Search text area style
-            model.search_text_area.set_cursor_line_style(Style::default().white().on_black());
-            model.search_text_area.set_cursor_style(Style::default().on_white().slow_blink());
-            model.search_text_area.set_block(Block::default().white().on_black());
+            model.search_text_area.set_cursor_line_style(
+                Style::default()
+                    .white()
+                    .on_black()
+            );
+            model.search_text_area.set_cursor_style(
+                Style::default()
+                    .on_white()
+                    .slow_blink()
+            );
+            model.search_text_area.set_block(
+                Block::default()
+                    .white()
+                    .on_black()
+            );
 
             if *state == AppState::Deleting {
                 frame.render_widget(
