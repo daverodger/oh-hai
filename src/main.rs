@@ -1,20 +1,16 @@
-use std::fs::File;
 use std::io::stdout;
-use std::sync::Arc;
 
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
-use tracing_subscriber::{filter, prelude::*};
 
 use handle::handle;
 use model::*;
 use oh_hai::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-
-    let log_file = File::create("debug.log")?;
-    let debug_log = tracing_subscriber::fmt::layer().with_writer(Arc::new(log_file)).pretty();
-    tracing_subscriber::registry().with(debug_log.with_filter(filter::LevelFilter::DEBUG)).init();
+    // let log_file = File::create("debug.log")?;
+    // let debug_log = tracing_subscriber::fmt::layer().with_writer(Arc::new(log_file)).pretty();
+    // tracing_subscriber::registry().with(debug_log.with_filter(filter::LevelFilter::DEBUG)).init();
 
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
@@ -25,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "-s" => {
             terminal = tui::init_terminal(9)?;
             update::update(Action::Search, &mut model);
-        },
+        }
         "-i" => {
             terminal = tui::init_terminal(4)?;
             let mut new_command = String::new();
@@ -39,8 +35,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             model.insert_text_area[1].insert_str(new_command);
             update::update(Action::Insert, &mut model);
-        },
-        _ => ()
+        }
+        _ => (),
     }
 
     while model.app_state != AppState::Done {
