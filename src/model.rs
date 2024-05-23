@@ -60,7 +60,8 @@ impl Model<'_> {
             .read(true)
             .write(true)
             .create(true)
-            .open(config::get_data_file_path().as_path()).unwrap();
+            .open(config::get_data_file_path().as_path())
+            .unwrap();
 
         Model {
             app_state: AppState::Initializing,
@@ -77,7 +78,7 @@ impl Model<'_> {
     }
 
     pub fn deserialize_commands(&mut self) {
-        self.command_list.commands = serde_json::from_reader(&self.bookmark_file).expect("unable to parse bookmarks.json"); // TODO breaks shit
+        self.command_list.commands = serde_json::from_reader(&self.bookmark_file).unwrap_or(vec![]);
         self.command_list.sorted_commands = self.command_list.commands.clone();
     }
 
@@ -86,7 +87,12 @@ impl Model<'_> {
     }
 
     pub fn get_fuzzied_cmd_list(bookmarks: Vec<Bookmark>) -> List<'static> {
-        List::new(bookmarks.into_iter().map(|x| x.tui_text_fuzzy()).collect::<Vec<Text>>())
+        List::new(
+            bookmarks
+                .into_iter()
+                .map(|x| x.tui_text_fuzzy())
+                .collect::<Vec<Text>>(),
+        )
     }
 
     pub fn sorted_command_len(&self) -> usize {

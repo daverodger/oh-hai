@@ -1,5 +1,5 @@
-use fuzzy_matcher::FuzzyMatcher;
 use fuzzy_matcher::skim::SkimMatcherV2;
+use fuzzy_matcher::FuzzyMatcher;
 
 use crate::bookmark::Bookmark;
 
@@ -12,7 +12,7 @@ pub fn sort(commands: Vec<Bookmark>, pattern: &str) -> Vec<Bookmark> {
         let mut title_score = None;
         let mut title_index = vec![];
         let mut command_score = None;
-        let mut command_index= vec![];
+        let mut command_index = vec![];
         if let Some(tuple) = matcher.fuzzy_indices(&b.title, pattern) {
             title_score = Some(tuple.0);
             title_index = tuple.1;
@@ -32,12 +32,10 @@ pub fn sort(commands: Vec<Bookmark>, pattern: &str) -> Vec<Bookmark> {
                 b.command_highlights = command_index;
                 score_map.push(CommandScore(score1 + score2, b))
             }
-            _ => ()
+            _ => (),
         }
     }
-    score_map.sort_by(|a, b| {
-        a.0.cmp(&b.0).reverse()
-    });
+    score_map.sort_by(|a, b| a.0.cmp(&b.0).reverse());
     score_map.into_iter().map(|x| x.1).collect()
 }
 

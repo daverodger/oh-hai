@@ -9,7 +9,13 @@ __crabmark_search__() {
   local output
   query=$(echo "${READLINE_LINE:0}" | grep -oE '(.)+$')
   oh-hai -s "$query"
-  output=$(cat ".command.txt");
+
+  # Get absolute path of this script
+  SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+  SCRIPT_DIR="$( dirname "$( readlink -f "$SCRIPT_SOURCE" )" )"
+  SCRIPT_DIR="${SCRIPT_DIR%/shell}"
+
+  output=$(cat "$SCRIPT_DIR/data/.command.txt");
   READLINE_LINE=${output}
   READLINE_POINT=0x7fffffff
 }

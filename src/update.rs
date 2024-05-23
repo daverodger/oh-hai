@@ -71,11 +71,11 @@ fn searching_update(action: Action, model: &mut Model) {
             });
         }
         Action::Exit => {
-            let _ = File::create(".command.txt");
+            let _ = File::create(config::get_output_file_path());
             model.app_state = AppState::Done;
         }
         Action::Submit => {
-            let mut file = File::create(".command.txt").unwrap();
+            let mut file = File::create(config::get_output_file_path()).unwrap();
             let selected_command = &model
                 .command_list
                 .sorted_commands
@@ -87,6 +87,7 @@ fn searching_update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Delete => {
+            // TODO handle delete on empty command list
             model.app_state = AppState::Deleting;
         }
         _ => (),

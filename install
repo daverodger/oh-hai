@@ -3,7 +3,7 @@
 APP_DIR=$(pwd)
 DATA_DIR="$APP_DIR/data"
 mkdir -p "$DATA_DIR"
-./config "$DATA_DIR/bookmarks.json"
+./config "$DATA_DIR"
 
 echo "Create symlink /usr/local/bin/oh-hai"
 sudo ln -sf "$APP_DIR/oh-hai" /usr/local/bin/oh-hai

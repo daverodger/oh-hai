@@ -28,15 +28,13 @@ impl Bookmark {
     }
 
     pub fn tui_text_fuzzy(self) -> Text<'static> {
-        let mut text = Text::from(
-            vec!(build_highlighted_text(self.title, self.title_highlights),
-                 build_highlighted_text(self.command, self.command_highlights)
-            )
-        );
+        let mut text = Text::from(vec![
+            build_highlighted_text(self.title, self.title_highlights),
+            build_highlighted_text(self.command, self.command_highlights),
+        ]);
 
         // add command prefix symbol
-        text
-            .lines
+        text.lines
             .get_mut(1)
             .expect("Second line should exist since we just built it")
             .spans
@@ -48,7 +46,7 @@ impl Bookmark {
 impl PartialEq for Bookmark {
     fn eq(&self, other: &Self) -> bool {
         if other.title == self.title || other.command == self.command {
-            return true
+            return true;
         }
         false
     }

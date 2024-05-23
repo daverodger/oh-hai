@@ -6,5 +6,5 @@ cp target/release/oh-hai oh_hai/
 cp install oh_hai/
 cp uninstall oh_hai/
 cp -r shell/ oh_hai/
-cargo build --release --bin config
+cargo build --release --bin generate-config
 cp target/release/config oh_hai/

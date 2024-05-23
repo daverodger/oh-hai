@@ -1,4 +1,4 @@
-use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers, poll};
+use crossterm::event::{self, poll, Event, KeyCode, KeyEventKind, KeyModifiers};
 
 use crate::model::Action;
 
@@ -12,7 +12,7 @@ pub fn handle() -> Option<Action> {
                     (KeyCode::Esc, _) => Some(Action::Exit),
                     (KeyCode::Enter, _) => Some(Action::Submit),
                     (KeyCode::Char('d'), KeyModifiers::CONTROL) => return Some(Action::Delete),
-                    _ => Some(Action::KeyInput(key))
+                    _ => Some(Action::KeyInput(key)),
                 };
             }
         }
