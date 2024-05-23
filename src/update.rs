@@ -3,31 +3,29 @@ use std::io::Write;
 
 use crossterm::event::KeyCode;
 
-use crate::{config, matcher};
 use crate::bookmark::Bookmark;
 use crate::model::{Action, AppState, InsertState, Model};
+use crate::{config, matcher};
 
 pub fn update(action: Action, model: &mut Model) {
     match model.app_state {
         AppState::Searching => searching_update(action, model),
         AppState::Inserting(InsertState::Unchecked) => inserting_update(action, model),
-        AppState::Inserting(_)=> confirm_insert(action, model),
+        AppState::Inserting(_) => confirm_insert(action, model),
         AppState::Deleting => delete_popup_update(action, model),
-        AppState::Initializing => {
-            match action {
-                Action::Search => {
-                    model.deserialize_commands();
-                    model.reset_state();
-                    model.app_state = AppState::Searching;
-                }
-                Action::Insert => {
-                    model.deserialize_commands();
-                    model.app_state = AppState::Inserting(InsertState::Unchecked);
-                }
-                _ => ()
+        AppState::Initializing => match action {
+            Action::Search => {
+                model.deserialize_commands();
+                model.reset_state();
+                model.app_state = AppState::Searching;
             }
-        }
-        _ => ()
+            Action::Insert => {
+                model.deserialize_commands();
+                model.app_state = AppState::Inserting(InsertState::Unchecked);
+            }
+            _ => (),
+        },
+        _ => (),
     }
 }
 
@@ -41,11 +39,13 @@ fn searching_update(action: Action, model: &mut Model) {
                     if search_text.is_empty() {
                         model.command_list.sorted_commands = model.command_list.commands.clone();
                     } else {
-                        model.command_list.sorted_commands = matcher::sort(model.command_list.commands.clone(), search_text);
+                        model.command_list.sorted_commands =
+                            matcher::sort(model.command_list.commands.clone(), search_text);
                     }
                 }
                 _ => {
-                    model.command_list.sorted_commands = matcher::sort(model.command_list.sorted_commands.clone(), search_text);
+                    model.command_list.sorted_commands =
+                        matcher::sort(model.command_list.sorted_commands.clone(), search_text);
                 }
             }
             model.reset_state();
@@ -76,7 +76,12 @@ fn searching_update(action: Action, model: &mut Model) {
         }
         Action::Submit => {
             let mut file = File::create(".command.txt").unwrap();
-            let selected_command = &model.command_list.sorted_commands.get(model.get_selected_index()).unwrap().command;
+            let selected_command = &model
+                .command_list
+                .sorted_commands
+                .get(model.get_selected_index())
+                .unwrap()
+                .command;
             file.write(selected_command.as_bytes()).unwrap();
 
             model.app_state = AppState::Done;
@@ -84,7 +89,7 @@ fn searching_update(action: Action, model: &mut Model) {
         Action::Delete => {
             model.app_state = AppState::Deleting;
         }
-        _ => ()
+        _ => (),
     }
 }
 
@@ -102,23 +107,34 @@ fn inserting_update(action: Action, model: &mut Model) {
         Action::Submit => {
             if model.insert_text_area[0].is_empty() || model.insert_text_area[1].is_empty() {
                 model.app_state = AppState::Inserting(InsertState::Blank);
-            } else if model.command_list.commands.contains(&create_bookmark_from_model(model)){
+            } else if model
+                .command_list
+                .commands
+                .contains(&create_bookmark_from_model(model))
+            {
                 model.app_state = AppState::Inserting(InsertState::Duplicate);
             } else {
                 insert_bookmark(model);
             }
         }
-        _ => ()
+        _ => (),
     }
 }
 
 fn delete_popup_update(action: Action, model: &mut Model) {
     if let Action::KeyInput(key) = action {
         if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
-            let _ = &model.command_list.sorted_commands.remove(model.get_selected_index());
-            let _ = &model.command_list.commands.remove(model.get_selected_index());
+            let _ = &model
+                .command_list
+                .sorted_commands
+                .remove(model.get_selected_index());
+            let _ = &model
+                .command_list
+                .commands
+                .remove(model.get_selected_index());
             model.bookmark_file = File::create(config::get_data_file_path().as_path()).unwrap();
-            serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
+            serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands)
+                .unwrap();
         }
     }
     model.app_state = AppState::Searching;
@@ -128,7 +144,7 @@ fn confirm_insert(action: Action, model: &mut Model) {
     if let Action::KeyInput(key) = action {
         if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
             insert_bookmark(model);
-            return
+            return;
         }
     }
     model.app_state = AppState::Inserting(InsertState::Unchecked);
