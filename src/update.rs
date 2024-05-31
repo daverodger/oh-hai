@@ -160,7 +160,7 @@ fn insert_bookmark(model: &mut Model) {
 }
 
 fn create_bookmark_from_model(model: &Model) -> Bookmark {
-    let title = model.insert_text_area[0].lines()[0].to_string();
-    let command = model.insert_text_area[1].lines()[0].to_string();
+    let title = model.insert_text_area[0].lines()[0].as_str();
+    let command = model.insert_text_area[1].lines()[0].as_str();
     Bookmark::new(title, command)
 }

@@ -5,17 +5,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Bookmark {
+    id: String,
     pub title: String,
     pub command: String,
     #[serde(skip)]
     pub title_highlights: Vec<usize>,
     #[serde(skip)]
     pub command_highlights: Vec<usize>,
-    id: String,
 }
 
 impl Bookmark {
-    pub fn new(title: String, command: String) -> Self {
+    pub fn new(title: &str, command: &str) -> Self {
         let title = title.trim().to_string();
         let command = command.trim().to_string();
         Bookmark {
