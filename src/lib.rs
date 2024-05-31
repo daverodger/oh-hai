@@ -3,7 +3,6 @@ pub mod config;
 pub mod handle;
 pub mod matcher;
 pub mod model;
-pub mod popup;
 pub mod tui;
 pub mod update;
 pub mod view;
