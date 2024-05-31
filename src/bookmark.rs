@@ -27,13 +27,14 @@ impl Bookmark {
         }
     }
 
+    // Returns fuzzy highlighted Text struct containing title and command
     pub fn tui_text_fuzzy(self) -> Text<'static> {
         let mut text = Text::from(vec![
             build_highlighted_text(self.title, self.title_highlights),
             build_highlighted_text(self.command, self.command_highlights),
         ]);
 
-        // add command prefix symbol
+        // Add command prefix symbol
         text.lines
             .get_mut(1)
             .expect("Second line should exist since we just built it")
@@ -43,6 +44,7 @@ impl Bookmark {
     }
 }
 
+// Custom eq returns true if either titles or command match
 impl PartialEq for Bookmark {
     fn eq(&self, other: &Self) -> bool {
         if other.title == self.title || other.command == self.command {
@@ -52,6 +54,7 @@ impl PartialEq for Bookmark {
     }
 }
 
+// Reconstructs input String as Line from highlighted Spans based on input array indexes
 pub fn build_highlighted_text(s: String, arr: Vec<usize>) -> Line<'static> {
     let mut line = Vec::new();
     let mut arr = arr;
