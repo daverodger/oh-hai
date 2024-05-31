@@ -2,8 +2,10 @@ use crossterm::event::{self, poll, Event, KeyCode, KeyEventKind, KeyModifiers};
 
 use crate::model::Action;
 
+// Responds to input events and returns appropriate Action
 pub fn handle() -> Option<Action> {
     if poll(std::time::Duration::from_millis(16)).ok()? {
+        // Listening for key press events only
         if let Event::Key(key) = event::read().ok()? {
             if key.kind == KeyEventKind::Press {
                 return match (key.code, key.modifiers) {
