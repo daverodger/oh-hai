@@ -23,6 +23,7 @@ impl Default for Config {
     }
 }
 
+// Creates config file if not found and returns Config struct
 fn get_config_file() -> Config {
     let config: Config = confy::load("oh-hai", None).unwrap();
     config
