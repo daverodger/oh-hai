@@ -6,7 +6,7 @@ use crate::bookmark::Bookmark;
 struct CommandScore(i64, Bookmark);
 
 // Consumes and returns a sorted Vec<Bookmark> from FuzzyMatcher scores based on the input pattern
-pub fn sort(commands: Vec<Bookmark>, pattern: &str) -> Vec<Bookmark> {
+pub fn sort<T: IntoIterator<Item = Bookmark>>(commands: T, pattern: &str) -> Vec<Bookmark> {
     let mut bookmark_scores: Vec<CommandScore> = Vec::new(); // Holds fuzzy scores and their associated Bookmark
     let matcher = SkimMatcherV2::default();
     for mut b in commands {
