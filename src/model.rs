@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 
 use crossterm::event::KeyEvent;
@@ -21,7 +22,7 @@ pub struct Model<'a> {
 #[derive(Debug, Clone)]
 pub struct StatefulList {
     pub state: ListState,
-    pub commands: Vec<Bookmark>,
+    pub commands: HashSet<Bookmark>,
     pub sorted_commands: Vec<Bookmark>,
 }
 
@@ -68,7 +69,7 @@ impl Model<'_> {
             app_state: AppState::Initializing,
             command_list: StatefulList {
                 state: ListState::default(),
-                commands: Vec::new(),
+                commands: HashSet::new(),
                 sorted_commands: Vec::new(),
             },
             search_text_area: TextArea::default(),
@@ -79,8 +80,15 @@ impl Model<'_> {
     }
 
     pub fn deserialize_commands(&mut self) {
-        self.command_list.commands = serde_json::from_reader(&self.bookmark_file).unwrap_or(vec![]);
-        self.command_list.sorted_commands = self.command_list.commands.clone();
+        self.command_list.commands =
+            serde_json::from_reader(&self.bookmark_file).unwrap_or(HashSet::new());
+        self.command_list.sorted_commands = Vec::from(
+            self.command_list
+                .commands
+                .clone()
+                .into_iter()
+                .collect::<Vec<Bookmark>>(),
+        );
     }
 
     pub fn reset_state(&mut self) {
@@ -105,5 +113,24 @@ impl Model<'_> {
 
     pub fn get_selected_index(&self) -> usize {
         self.command_list.state.selected().unwrap()
+    }
+
+    pub fn remove_selected_command(&mut self) {
+        let victim = self
+            .command_list
+            .sorted_commands
+            .get(self.get_selected_index())
+            .expect("Cmd should exist since it is selected");
+        self.command_list.commands.remove(victim);
+    }
+
+    pub fn reset_sorted(&mut self) {
+        self.command_list.sorted_commands = Vec::from(
+            self.command_list
+                .commands
+                .clone()
+                .into_iter()
+                .collect::<Vec<Bookmark>>(),
+        );
     }
 }
