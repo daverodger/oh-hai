@@ -39,7 +39,6 @@ pub enum AppState {
 pub enum InsertState {
     Unchecked,
     Blank,
-    Duplicate,
 }
 
 #[derive(PartialEq)]

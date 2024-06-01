@@ -116,14 +116,6 @@ fn inserting_update(action: Action, model: &mut Model) {
             // Check blank fields
             if model.insert_text_area[0].is_empty() || model.insert_text_area[1].is_empty() {
                 model.app_state = AppState::Inserting(InsertState::Blank);
-            }
-            // Check duplicates
-            else if model
-                .command_list
-                .commands
-                .contains(&create_bookmark_from_model(model))
-            {
-                model.app_state = AppState::Inserting(InsertState::Duplicate);
             } else {
                 insert_bookmark(model);
             }
