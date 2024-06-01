@@ -1,3 +1,5 @@
+use std::hash::{Hash, Hasher};
+
 use nanoid::nanoid;
 use ratatui::prelude::{Line, Span};
 use ratatui::text::Text;
@@ -5,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Bookmark {
-    id: String,
+    pub id: String,
     pub title: String,
     pub command: String,
     #[serde(skip)]
@@ -44,13 +46,25 @@ impl Bookmark {
     }
 }
 
-// Custom eq returns true if either titles or command match
+// Ignores highlights fields
 impl PartialEq for Bookmark {
     fn eq(&self, other: &Self) -> bool {
-        if other.title == self.title || other.command == self.command {
+        if other.title == self.title && other.command == self.command && other.id == self.id {
             return true;
         }
         false
+    }
+}
+
+// Cannot derive as highlights fields not relevant
+impl Eq for Bookmark {}
+
+// Cannot derive as highlights fields not relevant
+impl Hash for Bookmark {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.command.hash(state);
+        self.title.hash(state);
     }
 }
 
