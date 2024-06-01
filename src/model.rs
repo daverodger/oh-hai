@@ -14,7 +14,7 @@ pub struct Model<'a> {
     pub command_list: StatefulList,
     pub search_text_area: TextArea<'a>,
     pub insert_text_area: [TextArea<'a>; 2],
-    pub focus_insert: usize,
+    pub focus_insert: usize, // Active cursor line in input mode
     pub bookmark_file: File,
 }
 
@@ -56,6 +56,7 @@ pub enum Action {
 
 impl Model<'_> {
     pub fn new() -> Self {
+        // Read bookmark file in or create one if it does not exist
         let bookmark_file = File::options()
             .read(true)
             .write(true)
@@ -86,9 +87,12 @@ impl Model<'_> {
         self.command_list.state.select(Some(0));
     }
 
-    pub fn get_fuzzied_cmd_list(bookmarks: Vec<Bookmark>) -> List<'static> {
+    // Gets sorted commands with fuzzy matching highlights
+    pub fn get_fuzzed_cmd_list(&self) -> List<'static> {
         List::new(
-            bookmarks
+            self.command_list
+                .sorted_commands
+                .clone()
                 .into_iter()
                 .map(|x| x.tui_text_fuzzy())
                 .collect::<Vec<Text>>(),

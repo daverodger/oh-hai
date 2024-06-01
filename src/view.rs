@@ -37,7 +37,8 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             }
 
             // Get and style command list
-            let cmd_list = Model::get_fuzzied_cmd_list(model.command_list.sorted_commands.clone())
+            let cmd_list = model
+                .get_fuzzed_cmd_list()
                 .block(
                     Block::default()
                         .title(format!(
