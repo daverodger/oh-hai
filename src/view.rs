@@ -71,7 +71,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 }
                 InsertState::Duplicate => {
                     block = block
-                        .title("Duplicate title or command exists. Save anyway? (y/n)")
+                        .title("Duplicate command exists. Save anyway? (y/n)")
                         .light_yellow()
                         .on_black();
                 }
