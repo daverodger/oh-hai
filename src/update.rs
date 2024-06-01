@@ -17,7 +17,7 @@ pub fn update(action: Action, model: &mut Model) {
             Action::Search => {
                 model.deserialize_commands();
                 model.reset_state();
-                model.app_state = AppState::Searching;
+                model.app_state = AppState::Searching
             }
             Action::Insert => {
                 model.deserialize_commands();
@@ -29,6 +29,7 @@ pub fn update(action: Action, model: &mut Model) {
     }
 }
 
+// Update logic for search mode
 fn searching_update(action: Action, model: &mut Model) {
     match action {
         Action::KeyInput(key) => {
@@ -37,7 +38,7 @@ fn searching_update(action: Action, model: &mut Model) {
             match key.code {
                 KeyCode::Backspace => {
                     if search_text.is_empty() {
-                        model.command_list.sorted_commands = model.command_list.commands.clone();
+                        model.reset_sorted();
                     } else {
                         model.command_list.sorted_commands =
                             matcher::sort(model.command_list.commands.clone(), search_text);
@@ -71,10 +72,13 @@ fn searching_update(action: Action, model: &mut Model) {
             });
         }
         Action::Exit => {
+            // Needed to truncate the output file so the last command isn't re-exported
             let _ = File::create(config::get_output_file_path());
+
             model.app_state = AppState::Done;
         }
         Action::Submit => {
+            // Writes selected command to file which is copied to Readline line buffer by shell/key-bindings.bash
             let mut file = File::create(config::get_output_file_path()).unwrap();
             let selected_command = &model
                 .command_list
@@ -87,13 +91,16 @@ fn searching_update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Delete => {
-            // TODO handle delete on empty command list
-            model.app_state = AppState::Deleting;
+            // Only delete if visible command list isn't empty
+            if model.command_list.sorted_commands.len() > 0 {
+                model.app_state = AppState::Deleting;
+            }
         }
         _ => (),
     }
 }
 
+// Update logic for insert mode
 fn inserting_update(action: Action, model: &mut Model) {
     match action {
         Action::KeyInput(key) => {
@@ -106,9 +113,12 @@ fn inserting_update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Submit => {
+            // Check blank fields
             if model.insert_text_area[0].is_empty() || model.insert_text_area[1].is_empty() {
                 model.app_state = AppState::Inserting(InsertState::Blank);
-            } else if model
+            }
+            // Check duplicates
+            else if model
                 .command_list
                 .commands
                 .contains(&create_bookmark_from_model(model))
@@ -122,25 +132,27 @@ fn inserting_update(action: Action, model: &mut Model) {
     }
 }
 
+// Update logic for delete confirmation view
 fn delete_popup_update(action: Action, model: &mut Model) {
     if let Action::KeyInput(key) = action {
         if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
-            let _ = &model
-                .command_list
-                .sorted_commands
-                .remove(model.get_selected_index());
-            let _ = &model
-                .command_list
-                .commands
-                .remove(model.get_selected_index());
+            // Remove command from primary command list
+            model.remove_selected_command();
+
+            // Rewrite bookmark file without deleted command
             model.bookmark_file = File::create(config::get_data_file_path().as_path()).unwrap();
             serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands)
                 .unwrap();
+            model.search_text_area.delete_line_by_head();
+            model.search_text_area.delete_line_by_end();
+            model.reset_sorted();
+            model.reset_state();
         }
+        model.app_state = AppState::Searching;
     }
-    model.app_state = AppState::Searching;
 }
 
+// Update logic used during an insertion confirmation
 fn confirm_insert(action: Action, model: &mut Model) {
     if let Action::KeyInput(key) = action {
         if key.code == KeyCode::Char('y') || key.code == KeyCode::Char('Y') {
@@ -151,9 +163,10 @@ fn confirm_insert(action: Action, model: &mut Model) {
     model.app_state = AppState::Inserting(InsertState::Unchecked);
 }
 
+// Generates Bookmark from contents of insert_text_area and updates data file
 fn insert_bookmark(model: &mut Model) {
     let bm = create_bookmark_from_model(model);
-    model.command_list.commands.push(bm);
+    model.command_list.commands.insert(bm);
     model.bookmark_file = File::create(config::get_data_file_path().as_path()).unwrap();
     serde_json::to_writer_pretty(&model.bookmark_file, &model.command_list.commands).unwrap();
     model.app_state = AppState::Done;
