@@ -2,10 +2,11 @@ use ratatui::layout::{Alignment, Constraint, Direction, Layout};
 use ratatui::prelude::*;
 use ratatui::widgets::{Block, Borders, ListDirection, Paragraph};
 use ratatui::Frame;
+use tui_textarea::TextArea;
 
 use crate::model::{AppState, InsertState, Model};
 
-pub const HIGHLIGHT_COLOR: Style = Style::new().fg(Color::LightGreen);
+pub const HIGHLIGHT_COLOR: Color = Color::Green;
 pub const COMMAND_PREFIX: char = '>';
 
 pub fn view(frame: &mut Frame, model: &mut Model) {
@@ -19,13 +20,10 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             // Search text area style
             model
                 .search_text_area
-                .set_cursor_line_style(Style::default().white().on_black());
+                .set_cursor_line_style(Style::default().remove_modifier(Modifier::UNDERLINED));
             model
                 .search_text_area
-                .set_cursor_style(Style::default().on_white().slow_blink());
-            model
-                .search_text_area
-                .set_block(Block::default().white().on_black());
+                .set_cursor_style(Style::default().add_modifier(Modifier::REVERSED));
 
             if *state == AppState::Deleting {
                 frame.render_widget(
@@ -47,9 +45,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                         ))
                         .borders(Borders::ALL),
                 )
-                .white()
-                .on_black()
-                .highlight_style(Style::default().bg(Color::DarkGray))
+                .highlight_style(Style::default().add_modifier(Modifier::REVERSED))
                 .direction(ListDirection::TopToBottom);
 
             frame.render_stateful_widget(cmd_list, layout[1], &mut model.command_list.state);
@@ -61,7 +57,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
 
             match insert_state {
                 InsertState::Unchecked => {
-                    block = block.title("New Command").white().on_black();
+                    block = block.title("New Command");
                 }
                 InsertState::Blank => {
                     block = block
@@ -90,14 +86,8 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                 .constraints(vec![Constraint::Max(10), Constraint::Min(1)])
                 .split(outer_layout[2]);
 
-            // Insert style
-            model.insert_text_area[0].set_cursor_line_style(Style::default().fg(Color::White));
-            model.insert_text_area[0].set_cursor_style(Style::default().fg(Color::White));
-            model.insert_text_area[1].set_cursor_line_style(Style::default().fg(Color::White));
-            model.insert_text_area[1].set_cursor_style(Style::default().fg(Color::White));
-            // Show cursor only on focused line
-            model.insert_text_area[model.focus_insert]
-                .set_cursor_style(Style::default().bg(Color::White));
+            activate_text_area(&mut model.insert_text_area[model.focus_insert]);
+            deactivate_text_area(&mut model.insert_text_area[(model.focus_insert + 1) % 2]);
 
             frame.render_widget(block, frame.size());
 
@@ -117,4 +107,14 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
         }
         _ => (),
     }
+}
+
+fn activate_text_area(textarea: &mut TextArea) {
+    textarea.set_cursor_line_style(Style::default());
+    textarea.set_cursor_style(Style::default().add_modifier(Modifier::REVERSED));
+}
+
+fn deactivate_text_area(textarea: &mut TextArea) {
+    textarea.set_cursor_line_style(Style::default());
+    textarea.set_cursor_style(Style::default());
 }
