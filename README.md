@@ -5,6 +5,8 @@ A terminal command bookmarking tool written in Rust using [ratatui](https://gith
 
 Heavily inspired by [tbmk](https://github.com/linhx/tbmk).
 
+![oh-hai demo](./assets/demo.gif)
+
 ## Usage
 
 ---
@@ -18,11 +20,12 @@ The command-line buffer is copied into the search field (search mode) or the com
 ## Build and Install
 
 ---
+You'll need the rustc and cargo which are best installed using [rustup](https://www.rust-lang.org/tools/install)
 
-2. Run `./build` and move newly generated `/oh_hai` directory to its new home
+1. Run `./build` and move the newly generated `/oh_hai` directory to its new home
 1. cd into the app directory and run `./install`
 1. Restart shell or source config file
 
-Bookmarks are saved into `./data/bookmarks.json`.
+Bookmarks are saved into `./data/bookmarks.json` for manual editing.
 
-If you need to move the directory, run `./install` again after moving.
+If you need to move the app directory, run `./install` again after moving.
