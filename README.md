@@ -29,3 +29,9 @@ You'll need the rustc and cargo which are best installed using [rustup](https://
 Bookmarks are saved into `./data/bookmarks.json` for manual editing.
 
 If you need to move the app directory, run `./install` again after moving.
+
+## Todo
+
+---
+- Additional shell support (currently bash only)
+- Any testing at all would be an improvement
