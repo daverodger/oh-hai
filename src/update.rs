@@ -78,17 +78,19 @@ fn searching_update(action: Action, model: &mut Model) {
             model.app_state = AppState::Done;
         }
         Action::Submit => {
-            // Writes selected command to file which is copied to Readline line buffer by shell/key-bindings.bash
-            let mut file = File::create(config::get_output_file_path()).unwrap();
-            let selected_command = &model
-                .command_list
-                .sorted_commands
-                .get(model.get_selected_index())
-                .unwrap()
-                .command;
-            file.write(selected_command.as_bytes()).unwrap();
+            if model.sorted_command_len() > 0 {
+                // Writes selected command to file which is copied to Readline line buffer by shell/key-bindings.bash
+                let mut file = File::create(config::get_output_file_path()).unwrap();
+                let selected_command = &model
+                    .command_list
+                    .sorted_commands
+                    .get(model.get_selected_index())
+                    .unwrap()
+                    .command;
+                file.write(selected_command.as_bytes()).unwrap();
 
-            model.app_state = AppState::Done;
+                model.app_state = AppState::Done;
+            }
         }
         Action::Delete => {
             // Only delete if visible command list isn't empty
