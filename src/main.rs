@@ -14,6 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "-s" => {
             // Start in search mode
             terminal = tui::init_terminal(9)?;
+            terminal.clear()?;
             update::update(Action::Search, &mut model);
         }
         "-i" => {

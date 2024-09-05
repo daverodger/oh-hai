@@ -89,6 +89,7 @@ fn searching_update(action: Action, model: &mut Model) {
                     .command;
                 file.write(selected_command.as_bytes()).unwrap();
 
+                eprint!("{}", selected_command);
                 model.app_state = AppState::Done;
             }
         }
