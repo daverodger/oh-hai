@@ -1,15 +1,11 @@
-use std::io::stdout;
 use std::process::exit;
-
-use ratatui::backend::CrosstermBackend;
-use ratatui::Terminal;
 
 use handle::handle;
 use model::*;
 use oh_hai::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
+    let mut terminal;
     let mut model = Model::new();
 
     // Init terminal
