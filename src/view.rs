@@ -15,7 +15,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             let layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints(vec![Constraint::Max(1), Constraint::Min(2)])
-                .split(frame.size());
+                .split(frame.area());
 
             // Search text area style
             model
@@ -74,7 +74,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
                     Constraint::Max(1),
                     Constraint::Max(1),
                 ])
-                .split(frame.size());
+                .split(frame.area());
 
             let title_row = Layout::default()
                 .direction(Direction::Horizontal)
@@ -89,7 +89,7 @@ pub fn view(frame: &mut Frame, model: &mut Model) {
             activate_text_area(&mut model.insert_text_area[model.focus_insert]);
             deactivate_text_area(&mut model.insert_text_area[(model.focus_insert + 1) % 2]);
 
-            frame.render_widget(block, frame.size());
+            frame.render_widget(block, frame.area());
 
             frame.render_widget(
                 Paragraph::new(Line::raw("Name: ").right_aligned()),
