@@ -1,4 +1,5 @@
 use std::io::stdout;
+use std::process::exit;
 
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
@@ -37,7 +38,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             update::update(Action::Insert, &mut model);
         }
-        _ => (),
+        _ => {
+            println!("Unrecognized flag: use -i or -s");
+            exit(1)
+        }
     }
 
     // Main program loop
