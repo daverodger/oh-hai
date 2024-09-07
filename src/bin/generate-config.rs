@@ -7,11 +7,8 @@ fn main() -> Result<(), confy::ConfyError> {
     let path = PathBuf::from(std::env::args().skip(1).next().unwrap());
     let mut dp = path.clone();
     dp.push("../../bookmarks.json");
-    let mut op = path.clone();
-    op.push("../../.command.txt");
     let config = Config {
         data_path: dp,
-        output_path: op,
     };
     confy::store("oh-hai", None, config)?;
     Ok(())

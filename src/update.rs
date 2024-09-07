@@ -1,5 +1,4 @@
 use std::fs::File;
-use std::io::Write;
 
 use crossterm::event::KeyCode;
 
@@ -72,22 +71,16 @@ fn searching_update(action: Action, model: &mut Model) {
             });
         }
         Action::Exit => {
-            // Needed to truncate the output file so the last command isn't re-exported
-            let _ = File::create(config::get_output_file_path());
-
             model.app_state = AppState::Done;
         }
         Action::Submit => {
             if model.sorted_command_len() > 0 {
-                // Writes selected command to file which is copied to Readline line buffer by shell/key-bindings.bash
-                let mut file = File::create(config::get_output_file_path()).unwrap();
                 let selected_command = &model
                     .command_list
                     .sorted_commands
                     .get(model.get_selected_index())
                     .unwrap()
                     .command;
-                file.write(selected_command.as_bytes()).unwrap();
 
                 eprint!("{}", selected_command);
                 model.app_state = AppState::Done;

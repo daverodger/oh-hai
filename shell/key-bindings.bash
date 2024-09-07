@@ -8,15 +8,8 @@ __oh_hai_save__() {
 __oh_hai_search__() {
   local output
   query=$(echo "${READLINE_LINE:0}" | grep -oE '(.)+$')
-  oh-hai -s "$query"
-
-  # Get absolute path of this script
-  SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-  SCRIPT_DIR="$( dirname "$( readlink -f "$SCRIPT_SOURCE" )" )"
-  SCRIPT_DIR="${SCRIPT_DIR%/shell}"
-
-  output=$(cat "$SCRIPT_DIR/data/.command.txt");
-  READLINE_LINE=${output}
+  res=$(oh-hai -s "$query" >2)
+  READLINE_LINE=${res}
   READLINE_POINT=0x7fffffff
 }
 
