@@ -8,7 +8,7 @@ mkdir -p "$DATA_DIR"
 echo "Create symlink /usr/local/bin/oh-hai"
 sudo ln -sf "$APP_DIR/oh-hai" /usr/local/bin/oh-hai
 
-# for bash
+# bash
 FILE_BASHRC=~/.bashrc
 if [ -f "$FILE_BASHRC" ]; then
   BASH_SCRIPT_KEYBINDING="$APP_DIR/shell/key-bindings.bash"
@@ -25,6 +25,24 @@ EOT
   fi
 else
   echo "warn: $FILE_BASHRC does not exist."
+fi
+
+# nushell
+NU_CONFIG=~/.config/nushell/config.nu
+if [ -f "$NU_CONFIG" ]; then
+  NU_KEYBINDING="$APP_DIR/shell/key-bindings.nu"
+  NU_SCRIPT="$DATA_DIR/.nu"
+  tee "$NU_SCRIPT" > /dev/null <<EOT
+if ("'$NU_KEYBINDING'" | path exists) {
+source $NU_KEYBINDING }
+EOT
+  SOURCE_STR="if ('$NU_SCRIPT' | path exists) {source $NU_SCRIPT}"
+  SOURCE_STR_ESCAPED=$(echo "$SOURCE_STR" | sed 's/[][\\.*^$\-\/]/\\&/g')
+  if ! grep -q "^$SOURCE_STR_ESCAPED" $NU_CONFIG ; then
+    printf "\n$SOURCE_STR" >> $NU_CONFIG
+  fi
+else
+  echo "warn: $NU_CONFIG does not exist."
 fi
 
 echo 'Successfully installed'
