@@ -2,7 +2,7 @@
 
 A terminal command bookmarking tool written in Rust using [ratatui](https://github.com/ratatui-org/ratatui).
 
-Keybindings available for bash and nushell.
+Keybindings available for bash and [nushell](https://github.com/nushell/nushell).
 
 Heavily inspired by [tbmk](https://github.com/linhx/tbmk).
 
