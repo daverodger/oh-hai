@@ -2,6 +2,8 @@
 
 A terminal command bookmarking tool written in Rust using [ratatui](https://github.com/ratatui-org/ratatui).
 
+Keybindings available for bash and nushell.
+
 Heavily inspired by [tbmk](https://github.com/linhx/tbmk).
 
 ![oh-hai demo](./assets/demo.gif)
@@ -28,5 +30,5 @@ If you need to move the app directory, run `./install` again after moving.
 
 ## Todo
 
-- Additional shell support (currently bash only)
+- Additional shell support
 - Any testing at all would be an improvement
