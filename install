@@ -33,7 +33,7 @@ if [ -f "$NU_CONFIG" ]; then
   NU_KEYBINDING="$APP_DIR/shell/key-bindings.nu"
   NU_SCRIPT="$DATA_DIR/.nu"
   tee "$NU_SCRIPT" > /dev/null <<EOT
-if ("'$NU_KEYBINDING'" | path exists) {
+if ('$NU_KEYBINDING' | path exists) {
 source $NU_KEYBINDING }
 EOT
   SOURCE_STR="if ('$NU_SCRIPT' | path exists) {source $NU_SCRIPT}"
