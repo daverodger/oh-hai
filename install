@@ -45,5 +45,24 @@ else
   echo "warn: $NU_CONFIG does not exist."
 fi
 
+# zsh
+FILE_ZSHRC=~/.zshrc
+if [ -f "$FILE_ZSHRC" ]; then
+  ZSH_SCRIPT_KEYBINDING="$APP_DIR/shell/key-bindings.zsh"
+  RC_FILE="$DATA_DIR/.zsh"
+  tee "$RC_FILE" > /dev/null <<EOT
+if [ -f '$ZSH_SCRIPT_KEYBINDING' ]; then
+. '$ZSH_SCRIPT_KEYBINDING'
+fi
+EOT
+  SOURCE_STR="[ -f $RC_FILE ] && source $RC_FILE"
+  SOURCE_STR_ESCAPED=$(echo "$SOURCE_STR" | sed 's/[][\\.*^$\-\/]/\\&/g')
+  if ! grep -q "^$SOURCE_STR_ESCAPED" $FILE_ZSHRC ; then
+    printf "\n$SOURCE_STR" >> $FILE_ZSHRC
+  fi
+else
+  echo "warn: $FILE_ZSHRC does not exist."
+fi
+
 echo 'Successfully installed'
 echo 'Restart shell or reload bin file.'
