@@ -8,7 +8,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .nth(1)
         .ok_or("Configuration path required as first argument")?;
     let mut data_path = PathBuf::from(path);
-    data_path.push("../../bookmarks.json");
+    data_path.push("bookmarks.json");
     let config = Config { data_path };
     confy::store("oh-hai", None, config)?;
 

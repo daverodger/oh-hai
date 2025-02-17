@@ -4,12 +4,15 @@ APP_DIR=$(pwd)
 DATA_DIR="$APP_DIR/data"
 mkdir -p "$DATA_DIR"
 ./generate-config "$DATA_DIR"
+INSTALL_DIR="$HOME/.local/bin"
 
-echo "Create symlink /usr/local/bin/oh-hai"
-sudo ln -sf "$APP_DIR/oh-hai" /usr/local/bin/oh-hai
+
+echo "Create symlink $INSTALL_DIR/oh-hai"
+mkdir -pv "$INSTALL_DIR"
+sudo ln -sfv "$APP_DIR/oh-hai" "$INSTALL_DIR/oh-hai"
 
 # bash
-FILE_BASHRC=~/.bashrc
+FILE_BASHRC=$HOME/.bashrc
 if [ -f "$FILE_BASHRC" ]; then
   BASH_SCRIPT_KEYBINDING="$APP_DIR/shell/key-bindings.bash"
   RC_FILE="$DATA_DIR/.bash"
@@ -28,25 +31,13 @@ else
 fi
 
 # nushell
-NU_CONFIG=~/.config/nushell/config.nu
-if [ -f "$NU_CONFIG" ]; then
-  NU_KEYBINDING="$APP_DIR/shell/key-bindings.nu"
-  NU_SCRIPT="$DATA_DIR/.nu"
-  tee "$NU_SCRIPT" > /dev/null <<EOT
-if ('$NU_KEYBINDING' | path exists) {
-source $NU_KEYBINDING }
-EOT
-  SOURCE_STR="if ('$NU_SCRIPT' | path exists) {source $NU_SCRIPT}"
-  SOURCE_STR_ESCAPED=$(echo "$SOURCE_STR" | sed 's/[][\\.*^$\-\/]/\\&/g')
-  if ! grep -q "^$SOURCE_STR_ESCAPED" $NU_CONFIG ; then
-    printf "\n$SOURCE_STR" >> $NU_CONFIG
-  fi
-else
-  echo "warn: $NU_CONFIG does not exist."
-fi
+NU_KEYBINDING="$APP_DIR/shell/key-bindings.nu"
+NU_AUTOLOAD="$HOME/.local/share/nushell/vendor/autoload"
+mkdir -p "$NU_AUTOLOAD"
+ln -sfv "$NU_KEYBINDING" "$NU_AUTOLOAD/oh-hai-key-bindings.nu" 
 
 # zsh
-FILE_ZSHRC=~/.zshrc
+FILE_ZSHRC=$HOME/.zshrc
 if [ -f "$FILE_ZSHRC" ]; then
   ZSH_SCRIPT_KEYBINDING="$APP_DIR/shell/key-bindings.zsh"
   RC_FILE="$DATA_DIR/.zsh"

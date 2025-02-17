@@ -21,4 +21,4 @@ let oh_bindings = [
     }
 ]
 
-$env.config.keybindings = ($env.config.keybindings | append [$oh_bindings])
+$env.config.keybindings ++= $oh_bindings
